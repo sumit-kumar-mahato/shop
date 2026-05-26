@@ -82,7 +82,9 @@ export default async function ProfilePage() {
             <div>
               <div className="flex bg-white dark:bg-zinc-950 border border-luxury-200 dark:border-zinc-800 rounded p-2 justify-between items-center text-xs font-mono text-luxury-600">
                 <span className="font-bold truncate">AVG-REF-GUEST</span>
-                <Clipboard size={14} className="text-luxury-gold cursor-pointer hover:scale-110 transition-transform" title="Copy Referral Link" />
+                <span title="Copy Referral Link" className="flex items-center">
+                  <Clipboard size={14} className="text-luxury-gold cursor-pointer hover:scale-110 transition-transform" />
+                </span>
               </div>
             </div>
           </div>
