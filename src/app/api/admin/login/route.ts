@@ -5,11 +5,25 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
     
-    // Fallback credentials if environment variables are not set
-    const expectedUsername = process.env.ADMIN_USERNAME || "admin";
-    const expectedPassword = process.env.ADMIN_PASSWORD || "prabodh2026";
+    // Read credentials from environment variables
+    const expectedUsername = process.env.ADMIN_USERNAME;
+    const expectedPassword = process.env.ADMIN_PASSWORD;
     
-    if (username === expectedUsername && password === expectedPassword) {
+    // In production, we strictly require credentials to be set in environment variables.
+    // If not set, we do not fall back to default values to prevent unauthorized access.
+    if (process.env.NODE_ENV === "production" && (!expectedUsername || !expectedPassword)) {
+      console.error("ADMIN_USERNAME or ADMIN_PASSWORD environment variable is not defined in production!");
+      return NextResponse.json(
+        { success: false, error: "Administrative access is not configured on this server." },
+        { status: 500 }
+      );
+    }
+
+    // Default credentials for local development if not configured
+    const devUsername = expectedUsername || "admin";
+    const devPassword = expectedPassword || "admin";
+
+    if (username === devUsername && password === devPassword) {
       // Set secure HTTP-only cookie
       cookies().set("admin_token", "authenticated-session-token", {
         httpOnly: true,

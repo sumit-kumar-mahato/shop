@@ -7,8 +7,10 @@ An enterprise-grade, luxury-designed fashion storefront and integrated visual ad
 ## 🌐 Live Production Links (Online)
 * **Client Storefront:** [https://shop-silk-zeta.vercel.app](https://shop-silk-zeta.vercel.app)
 * **Secure Admin CMS Dashboard:** [https://shop-silk-zeta.vercel.app/admin](https://shop-silk-zeta.vercel.app/admin)
-  * *Username:* `admin`
-  * *Password:* `prabodh2026`
+
+> [!IMPORTANT]
+> **Admin CMS Credentials Protection:**
+> To protect your storefront, hardcoded credentials have been completely disabled in production. You must set your custom secure credentials as environment variables (`ADMIN_USERNAME` and `ADMIN_PASSWORD`) in your Vercel project settings dashboard.
 
 ---
 
