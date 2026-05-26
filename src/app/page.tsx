@@ -17,7 +17,7 @@ function safeParse(jsonString: string, fallback: any = []) {
 
 export default async function HomePage() {
   // 1. Fetch Store CMS Configurations
-  let settings = {
+  let settings: any = {
     storeName: "PRABODH KUMAR MAHATO CLOTHING",
     banners: [] as any[],
     sectionsOrder: [] as string[],
