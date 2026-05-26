@@ -54,7 +54,7 @@ export default async function HomePage() {
     featuredProducts = await prisma.product.findMany({ where: { isFeatured: true }, take: 4 });
     trendingProducts = await prisma.product.findMany({ where: { isTrending: true }, take: 4 });
     bestSellers = await prisma.product.findMany({ where: { isBestSeller: true }, take: 4 });
-    newArrivals = await prisma.product.findMany({ where: { isNewArrival: true }, order: { createdAt: "desc" }, take: 4 });
+    newArrivals = await prisma.product.findMany({ where: { isNewArrival: true }, orderBy: { createdAt: "desc" }, take: 4 });
     flashSaleProducts = await prisma.product.findMany({ where: { isFlashSale: true }, take: 4 });
   } catch (e) {}
 
