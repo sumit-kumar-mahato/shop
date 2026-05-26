@@ -74,7 +74,7 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-16 pb-12 overflow-hidden">
-      {sectionsToRender.map((sectionId) => {
+      {sectionsToRender.map((sectionId: string) => {
         switch (sectionId) {
           case "hero-slider":
             return (
