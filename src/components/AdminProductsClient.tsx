@@ -241,10 +241,10 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-zinc-800 pb-4">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
-          <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-white">Products Catalog</h1>
-          <p className="text-xs text-zinc-400 font-light mt-0.5">Visually list, edit, or create retail items.</p>
+          <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-zinc-900 dark:text-white">Products Catalog</h1>
+          <p className="text-xs text-zinc-550 dark:text-zinc-400 font-light mt-0.5">Visually list, edit, or create retail items.</p>
         </div>
         <button
           onClick={openAddModal}
@@ -263,13 +263,13 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
             placeholder="Search by Title or SKU..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 text-xs py-3 pl-10 pr-4 rounded focus:outline-none focus:border-luxury-gold text-white placeholder-zinc-500"
+            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs py-3 pl-10 pr-4 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500"
           />
         </div>
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          className="bg-zinc-900 border border-zinc-800 text-xs py-3 px-4 rounded focus:outline-none focus:border-luxury-gold text-zinc-300 sm:w-48"
+          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs py-3 px-4 rounded focus:outline-none focus:border-luxury-gold text-zinc-800 dark:text-zinc-300 sm:w-48"
         >
           <option value="">All Categories</option>
           {categories.map((c) => (
@@ -281,11 +281,11 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
       </div>
 
       {/* Catalog Table */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs font-light text-left border-collapse text-zinc-400">
+          <table className="w-full text-xs font-light text-left border-collapse text-zinc-500 dark:text-zinc-400">
             <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400 uppercase font-semibold text-[10px] tracking-wider">
+              <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 uppercase font-semibold text-[10px] tracking-wider">
                 <th className="py-3.5 px-4">Item</th>
                 <th className="py-3.5 px-4">SKU</th>
                 <th className="py-3.5 px-4">Category</th>
@@ -295,41 +295,41 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/80">
+            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-zinc-500 italic">No products match search criteria.</td>
+                  <td colSpan={7} className="py-8 text-center text-zinc-555 dark:text-zinc-500 italic">No products match search criteria.</td>
                 </tr>
               ) : (
                 filtered.map((p) => {
                   const imgs = safeParse(p.images);
                   return (
-                    <tr key={p.id} className="hover:bg-zinc-800/20 transition-colors">
+                    <tr key={p.id} className="hover:bg-zinc-55 dark:hover:bg-zinc-800/20 transition-colors">
                       <td className="py-3 px-4 flex items-center gap-3">
-                        <div className="relative w-9 h-12 flex-shrink-0 bg-zinc-800">
+                        <div className="relative w-9 h-12 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
                           <img src={imgs[0]} alt={p.title} className="object-cover w-full h-full" />
                         </div>
-                        <span className="font-semibold text-zinc-200 uppercase truncate w-48 block">{p.title}</span>
+                        <span className="font-semibold text-zinc-800 dark:text-zinc-200 uppercase truncate w-48 block">{p.title}</span>
                       </td>
-                      <td className="py-3 px-4 font-mono text-zinc-400 uppercase">{p.sku}</td>
-                      <td className="py-3 px-4 font-medium text-zinc-300">{p.categoryName}</td>
-                      <td className="py-3 px-4 text-[10px] bg-zinc-800/40 text-zinc-300 font-bold rounded px-2 py-0.5 inline-block mt-3">{p.gender}</td>
+                      <td className="py-3 px-4 font-mono text-zinc-500 dark:text-zinc-400 uppercase">{p.sku}</td>
+                      <td className="py-3 px-4 font-medium text-zinc-800 dark:text-zinc-300">{p.categoryName}</td>
+                      <td className="py-3 px-4 text-[10px] bg-zinc-100 dark:bg-zinc-800/40 text-zinc-700 dark:text-zinc-300 font-bold rounded px-2 py-0.5 inline-block mt-3">{p.gender}</td>
                       <td className="py-3 px-4">
-                        <span className={`font-bold ${p.stock <= 5 ? "text-red-500 font-bold" : "text-zinc-300"}`}>{p.stock} units</span>
+                        <span className={`font-bold ${p.stock <= 5 ? "text-red-500 font-bold" : "text-zinc-700 dark:text-zinc-300"}`}>{p.stock} units</span>
                       </td>
-                      <td className="py-3 px-4 font-bold text-zinc-200">₹{p.price}</td>
+                      <td className="py-3 px-4 font-bold text-zinc-900 dark:text-zinc-200 font-mono font-bold">₹{p.price}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => openEditModal(p)}
-                            className="p-2 hover:bg-zinc-800 hover:text-luxury-gold transition-colors rounded"
+                            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-luxury-gold transition-colors rounded text-zinc-500 dark:text-zinc-400"
                             title="Edit Product"
                           >
                             <Edit3 size={14} />
                           </button>
                           <button
                             onClick={() => handleDelete(p.id)}
-                            className="p-2 hover:bg-zinc-800 hover:text-red-500 transition-colors rounded"
+                            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-500 transition-colors rounded text-zinc-500 dark:text-zinc-400"
                             title="Delete Product"
                           >
                             <Trash2 size={14} />
@@ -345,34 +345,33 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
         </div>
       </div>
 
-      {/* Editor Modal Overlay */}
-      {modalOpen && (
+      {/* Editor Modal Overlay */      {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
-          <div className="relative w-full max-w-5xl bg-zinc-900 border border-zinc-800 p-6 rounded shadow-2xl z-10 space-y-6 max-h-[95vh] overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
-              <h3 className="serif-header text-lg uppercase tracking-wider text-white font-bold">
+          <div className="relative w-full max-w-5xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded shadow-2xl z-10 space-y-6 max-h-[95vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3">
+              <h3 className="serif-header text-lg uppercase tracking-wider text-zinc-900 dark:text-white font-bold">
                 {editProduct ? "Modify Product Details" : "Create New Catalog Entry"}
               </h3>
-              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-zinc-800 rounded">
+              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-500 dark:text-zinc-400">
                 <X size={18} />
               </button>
             </div>
 
             {/* Quick Templates Selector (Only for creation) */}
             {!editProduct && (
-              <div className="bg-zinc-950 p-4 border border-zinc-800 rounded-sm">
+              <div className="bg-zinc-50 dark:bg-zinc-950 p-4 border border-zinc-200 dark:border-zinc-800 rounded-sm">
                 <span className="text-[10px] font-bold text-luxury-gold uppercase tracking-widest flex items-center gap-1 mb-2">
                   <Sparkles size={11} /> Quick Visual Templates
                 </span>
-                <p className="text-[11px] text-zinc-400 mb-3">Click to instantly populate dummy assets and mock images:</p>
+                <p className="text-[11px] text-zinc-550 dark:text-zinc-400 mb-3">Click to instantly populate dummy assets and mock images:</p>
                 <div className="flex flex-wrap gap-2">
                   {clothingTemplates.map((t) => (
                     <button
                       key={t.title}
                       type="button"
                       onClick={() => handleApplyTemplate(t)}
-                      className="text-[10px] bg-zinc-900 border border-zinc-800 hover:border-luxury-gold hover:text-white px-3 py-1.5 rounded transition-all"
+                      className="text-[10px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-luxury-gold hover:text-zinc-900 dark:hover:text-white px-3 py-1.5 rounded transition-all text-zinc-700 dark:text-zinc-300"
                     >
                       {t.title}
                     </button>
@@ -386,81 +385,81 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
               <form onSubmit={handleSave} className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 {/* Title */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Product Title</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Product Title</label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white uppercase font-bold"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white uppercase font-bold"
                     required
                   />
                 </div>
 
                 {/* SKU */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Garment SKU (Unique)</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Garment SKU (Unique)</label>
                   <input
                     type="text"
                     value={sku}
                     onChange={(e) => setSku(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-mono uppercase font-bold"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono uppercase font-bold"
                     required
                   />
                 </div>
 
                 {/* Description */}
                 <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Product Description</label>
+                  <label className="text-[9px] font-bold text-zinc-555 dark:text-zinc-400 uppercase">Product Description</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={2}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-light"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-light"
                   />
                 </div>
 
                 {/* Price */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Selling Price (₹)</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Selling Price (₹)</label>
                   <input
                     type="number"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-bold"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-bold"
                     required
                   />
                 </div>
 
                 {/* Compare Price */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Original Price Before Discount (₹)</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Original Price Before Discount (₹)</label>
                   <input
                     type="number"
                     value={compareAtPrice}
                     onChange={(e) => setCompareAtPrice(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                   />
                 </div>
 
                 {/* Stock */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Stock Inventory Quantity</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Stock Inventory Quantity</label>
                   <input
                     type="number"
                     value={stock}
                     onChange={(e) => setStock(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-bold font-mono"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-bold font-mono"
                     required
                   />
                 </div>
 
                 {/* Gender */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Gender Classification</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Gender Classification</label>
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-300"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-800 dark:text-zinc-300"
                   >
                     <option value="Men">Men</option>
                     <option value="Women">Women</option>
@@ -471,11 +470,11 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
 
                 {/* Category */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Category Name</label>
+                  <label className="text-[9px] font-bold text-zinc-555 dark:text-zinc-400 uppercase">Category Name</label>
                   <select
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-300"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-800 dark:text-zinc-300"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.name}>
@@ -487,58 +486,58 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
 
                 {/* Image URL */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Image Photo Link (URL)</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Image Photo Link (URL)</label>
                   <input
                     type="text"
                     value={imageInput}
                     onChange={(e) => setImageInput(e.target.value)}
                     placeholder="https://images.unsplash.com/..."
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                     required
                   />
                 </div>
 
                 {/* Sizes list */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Available Sizes (Comma Separated)</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Available Sizes (Comma Separated)</label>
                   <input
                     type="text"
                     value={sizesInput}
                     onChange={(e) => setSizesInput(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-semibold font-mono"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-semibold font-mono"
                   />
                 </div>
 
                 {/* Colors list */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Available Colors (Hex Codes, Comma Separated)</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Available Colors (Hex Codes, Comma Separated)</label>
                   <input
                     type="text"
                     value={colorsInput}
                     onChange={(e) => setColorsInput(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-semibold font-mono"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-semibold font-mono"
                   />
                 </div>
 
                 {/* Fabric spec */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Fabric details</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Fabric details</label>
                   <input
                     type="text"
                     value={fabric}
                     onChange={(e) => setFabric(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                   />
                 </div>
 
                 {/* Fit spec */}
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-400 uppercase">Garment Fit spec</label>
+                  <label className="text-[9px] font-bold text-zinc-550 dark:text-zinc-400 uppercase">Garment Fit spec</label>
                   <input
                     type="text"
                     value={fit}
                     onChange={(e) => setFit(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                    className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                   />
                 </div>
 
@@ -547,14 +546,14 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="w-1/2 border border-zinc-800 text-zinc-400 font-bold hover:bg-zinc-800/20 py-3 uppercase rounded-sm"
+                    className="w-1/2 border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 py-3 uppercase rounded-sm"
                   >
                     CANCEL
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="w-1/2 bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-950 font-bold py-3 uppercase rounded-sm transition-all"
+                    className="w-1/2 bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-955 font-bold py-3 uppercase rounded-sm transition-all"
                   >
                     {saving ? "SAVING ENTRY..." : "SAVE PRODUCT"}
                   </button>
@@ -562,21 +561,21 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
               </form>
 
               {/* Right Column: Live Storefront Card Preview */}
-              <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-zinc-800 pt-6 lg:pt-0 lg:pl-6 space-y-4">
+              <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 pt-6 lg:pt-0 lg:pl-6 space-y-4">
                 <h4 className="text-[10px] font-bold text-luxury-gold uppercase tracking-widest flex items-center gap-1">
                   <Sparkles size={11} className="animate-pulse" /> Live Card Preview
                 </h4>
 
-                <div className="bg-zinc-950 border border-zinc-850 p-4 rounded-sm space-y-3 relative overflow-hidden text-left shadow-lg">
+                <div className="bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-850 p-4 rounded-sm space-y-3 relative overflow-hidden text-left shadow-lg">
                   {/* Image Box */}
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-zinc-900 flex items-center justify-center border border-zinc-805">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center border border-zinc-200 dark:border-zinc-805">
                     {imageInput ? (
                       <img src={imageInput} alt="Preview" className="object-cover w-full h-full" />
                     ) : (
-                      <span className="text-zinc-600 text-[10px] uppercase font-mono tracking-widest">No Image Selected</span>
+                      <span className="text-zinc-500 dark:text-zinc-600 text-[10px] uppercase font-mono tracking-widest">No Image Selected</span>
                     )}
                     {compareAtPrice && parseFloat(compareAtPrice) > parseFloat(price) && (
-                      <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-950 text-[9px] font-bold px-2 py-0.5 uppercase rounded-sm">
+                      <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-955 text-[9px] font-bold px-2 py-0.5 uppercase rounded-sm">
                         -{Math.round(((parseFloat(compareAtPrice) - parseFloat(price)) / parseFloat(compareAtPrice)) * 100)}% OFF
                       </span>
                     )}
@@ -601,33 +600,33 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
                         <span>4.8</span>
                       </div>
                     </div>
-                    <h4 className="font-semibold text-xs text-zinc-200 line-clamp-1 uppercase tracking-wide">
+                    <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-200 line-clamp-1 uppercase tracking-wide">
                       {title || "Apparel item name"}
                     </h4>
-                    <p className="text-[10px] text-zinc-500 line-clamp-2 min-h-[30px] font-light leading-relaxed">
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-500 line-clamp-2 min-h-[30px] font-light leading-relaxed">
                       {description || "No description provided yet."}
                     </p>
 
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-800">
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-white">₹{price || "0"}</span>
+                        <span className="text-xs font-bold text-zinc-900 dark:text-white font-mono">₹{price || "0"}</span>
                         {compareAtPrice && parseFloat(compareAtPrice) > 0 && (
-                          <span className="text-[10px] text-zinc-600 line-through">₹{compareAtPrice}</span>
+                          <span className="text-[10px] text-zinc-400 dark:text-zinc-600 line-through font-mono">₹{compareAtPrice}</span>
                         )}
                       </div>
-                      <span className="text-[9px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 rounded font-mono font-bold uppercase">
+                      <span className="text-[9px] bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 px-2 py-0.5 rounded font-mono font-bold uppercase">
                         {sizesInput ? sizesInput.split(",").length : 0} Sizes
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-zinc-950/40 p-3.5 border border-zinc-800/80 rounded-sm text-[10px] text-zinc-500 font-light space-y-2">
-                  <p className="font-bold text-zinc-400 uppercase tracking-widest">Specifications:</p>
-                  <p><strong className="text-zinc-400 font-semibold uppercase">Fabric:</strong> {fabric || "Not specified"}</p>
-                  <p><strong className="text-zinc-400 font-semibold uppercase">Fit:</strong> {fit || "Not specified"}</p>
-                  <p><strong className="text-zinc-400 font-semibold uppercase">Gender:</strong> {gender}</p>
-                  <p><strong className="text-zinc-400 font-semibold uppercase">SKU:</strong> <span className="font-mono">{sku || "None"}</span></p>
+                <div className="bg-zinc-50 dark:bg-zinc-955/40 p-3.5 border border-zinc-200 dark:border-zinc-800/80 rounded-sm text-[10px] text-zinc-500 dark:text-zinc-500 font-light space-y-2">
+                  <p className="font-bold text-zinc-700 dark:text-zinc-400 uppercase tracking-widest">Specifications:</p>
+                  <p><strong className="text-zinc-700 dark:text-zinc-400 font-semibold uppercase">Fabric:</strong> {fabric || "Not specified"}</p>
+                  <p><strong className="text-zinc-700 dark:text-zinc-400 font-semibold uppercase">Fit:</strong> {fit || "Not specified"}</p>
+                  <p><strong className="text-zinc-700 dark:text-zinc-400 font-semibold uppercase">Gender:</strong> {gender}</p>
+                  <p><strong className="text-zinc-700 dark:text-zinc-400 font-semibold uppercase">SKU:</strong> <span className="font-mono">{sku || "None"}</span></p>
                 </div>
               </div>
             </div>

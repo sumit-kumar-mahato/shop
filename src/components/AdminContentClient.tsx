@@ -113,11 +113,11 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
+    <div className="space-y-8 animate-fade-in text-zinc-800 dark:text-zinc-100">
+      <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
-          <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-white">Homepage & CMS Editor</h1>
-          <p className="text-xs text-zinc-400 font-light mt-0.5">Drag-and-drop or reorder section modules visually.</p>
+          <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-zinc-900 dark:text-white">Homepage & CMS Editor</h1>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-light mt-0.5">Drag-and-drop or reorder section modules visually.</p>
         </div>
         <button
           onClick={handleSave}
@@ -131,11 +131,11 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Module Order Rearranger */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-sm space-y-4">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-300 flex items-center gap-1.5">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-sm space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-800 dark:text-zinc-300 flex items-center gap-1.5">
               <Palette size={15} className="text-luxury-gold" /> Section Layout Order
             </h3>
-            <p className="text-[11px] text-zinc-400 font-light leading-relaxed">
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-light leading-relaxed">
               Rearrange the home page sections using the Up/Down keys. Edits update live on the storefront.
             </p>
 
@@ -143,23 +143,23 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
               {config.sectionsOrder.map((sectionId, idx) => (
                 <div
                   key={sectionId}
-                  className="bg-zinc-950 border border-zinc-800/80 p-3 rounded flex justify-between items-center text-xs text-zinc-300"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 p-3 rounded flex justify-between items-center text-xs text-zinc-700 dark:text-zinc-300"
                 >
-                  <span className="font-semibold uppercase truncate w-40">
+                  <span className="font-semibold uppercase truncate w-40 text-zinc-800 dark:text-zinc-250">
                     {sectionLabels[sectionId] || sectionId}
                   </span>
                   <div className="flex gap-1.5 flex-shrink-0">
                     <button
                       onClick={() => moveSection(idx, "up")}
                       disabled={idx === 0}
-                      className="p-1.5 bg-zinc-900 border border-zinc-800 rounded hover:text-luxury-gold disabled:opacity-40"
+                      className="p-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded hover:text-luxury-gold dark:hover:text-luxury-gold text-zinc-600 dark:text-zinc-300 disabled:opacity-40"
                     >
                       <ArrowUp size={12} />
                     </button>
                     <button
                       onClick={() => moveSection(idx, "down")}
                       disabled={idx === config.sectionsOrder.length - 1}
-                      className="p-1.5 bg-zinc-900 border border-zinc-800 rounded hover:text-luxury-gold disabled:opacity-40"
+                      className="p-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded hover:text-luxury-gold dark:hover:text-luxury-gold text-zinc-600 dark:text-zinc-300 disabled:opacity-40"
                     >
                       <ArrowDown size={12} />
                     </button>
@@ -175,73 +175,73 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
           {config.banners.map((banner, index) => (
             <div
               key={banner.id}
-              className="bg-zinc-900 border border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-400"
+              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-600 dark:text-zinc-400"
             >
-              <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2 flex justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2 flex justify-between">
                 <span>Carousel Banner slide #{index + 1}</span>
                 <span className="text-[10px] text-luxury-gold uppercase font-mono">{banner.id}</span>
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Banner Headline</label>
+                  <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Banner Headline</label>
                   <input
                     type="text"
                     value={banner.title}
                     onChange={(e) => handleBannerChange(index, "title", e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-bold uppercase"
+                    className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold text-zinc-900 dark:text-white font-bold uppercase"
                   />
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Subtitle / Category Tag</label>
+                  <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Subtitle / Category Tag</label>
                   <input
                     type="text"
                     value={banner.subtitle}
                     onChange={(e) => handleBannerChange(index, "subtitle", e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white uppercase"
+                    className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold text-zinc-900 dark:text-white uppercase"
                   />
                 </div>
 
                 <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Banner description</label>
+                  <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Banner description</label>
                   <textarea
                     value={banner.description}
                     onChange={(e) => handleBannerChange(index, "description", e.target.value)}
                     rows={2}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                    className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold text-zinc-900 dark:text-white"
                   />
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Button Caption</label>
+                  <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Button Caption</label>
                   <input
                     type="text"
                     value={banner.buttonText}
                     onChange={(e) => handleBannerChange(index, "buttonText", e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-bold"
+                    className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold text-zinc-900 dark:text-white font-bold"
                   />
                 </div>
 
                 <div className="flex flex-col space-y-1.5">
-                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Button Redirect Link</label>
+                  <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Button Redirect Link</label>
                   <input
                     type="text"
                     value={banner.link}
                     onChange={(e) => handleBannerChange(index, "link", e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-mono"
+                    className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold text-zinc-900 dark:text-white font-mono"
                   />
                 </div>
 
                 <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Background Image Link (URL)</label>
+                  <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Background Image Link (URL)</label>
                   <input
                     type="text"
                     value={banner.image}
                     onChange={(e) => handleBannerChange(index, "image", e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-mono"
+                    className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold text-zinc-900 dark:text-white font-mono"
                   />
-                  <div className="relative w-full h-24 bg-zinc-950 border border-zinc-800 rounded overflow-hidden">
+                  <div className="relative w-full h-24 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded overflow-hidden">
                     <img src={banner.image} alt="Preview Banner" className="object-cover w-full h-full opacity-60" />
                   </div>
                 </div>
@@ -250,227 +250,227 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
           ))}
 
           {/* Promo Highlight Editor */}
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-400">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-650 dark:text-zinc-400">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2">
               Promo Highlight Module Config
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Promo Headline</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Promo Headline</label>
                 <input
                   type="text"
                   value={config.promoHighlight?.title || ""}
                   onChange={(e) => handlePromoChange("title", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold uppercase"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold uppercase focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Promo Subtitle</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Promo Subtitle</label>
                 <input
                   type="text"
                   value={config.promoHighlight?.subtitle || ""}
                   onChange={(e) => handlePromoChange("subtitle", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Button Caption</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Button Caption</label>
                 <input
                   type="text"
                   value={config.promoHighlight?.buttonText || ""}
                   onChange={(e) => handlePromoChange("buttonText", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Button Link</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Button Link</label>
                 <input
                   type="text"
                   value={config.promoHighlight?.link || ""}
                   onChange={(e) => handlePromoChange("link", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-mono"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Image URL</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Image URL</label>
                 <input
                   type="text"
                   value={config.promoHighlight?.image || ""}
                   onChange={(e) => handlePromoChange("image", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-mono"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
             </div>
           </div>
 
           {/* Brand Philosophy Editor */}
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-400">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-600 dark:text-zinc-400">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2">
               Brand Philosophy (Philosophy Card)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Story Title</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Story Title</label>
                 <input
                   type="text"
                   value={(config as any).brandStoryTitle || ""}
                   placeholder="Weaving Heritage with Modern Geometries"
                   onChange={(e) => handleConfigChange("brandStoryTitle", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Story Paragraph 1</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Story Paragraph 1</label>
                 <textarea
                   value={(config as any).brandStoryDesc1 || ""}
                   placeholder="Founded with a dedication to premium materials..."
                   onChange={(e) => handleConfigChange("brandStoryDesc1", e.target.value)}
                   rows={3}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white leading-relaxed"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white leading-relaxed focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Story Paragraph 2</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Story Paragraph 2</label>
                 <textarea
                   value={(config as any).brandStoryDesc2 || ""}
                   placeholder="We reject fast fashion cycles..."
                   onChange={(e) => handleConfigChange("brandStoryDesc2", e.target.value)}
                   rows={3}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white leading-relaxed"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white leading-relaxed focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">philosophy Image URL</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">philosophy Image URL</label>
                 <input
                   type="text"
                   value={(config as any).brandStoryImage || ""}
                   onChange={(e) => handleConfigChange("brandStoryImage", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-mono"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
             </div>
           </div>
 
           {/* Newsletter Text Editor */}
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-400">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-650 dark:text-zinc-400">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2">
               Newsletter Customization
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Headline</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Headline</label>
                 <input
                   type="text"
                   value={(config as any).newsletterTitle || ""}
                   placeholder="Unlock Exclusive Previews"
                   onChange={(e) => handleConfigChange("newsletterTitle", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Subtext Description</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Subtext Description</label>
                 <textarea
                   value={(config as any).newsletterDesc || ""}
                   placeholder="Subscribe to our private list..."
                   onChange={(e) => handleConfigChange("newsletterDesc", e.target.value)}
                   rows={2}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-light"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-light focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
             </div>
           </div>
 
           {/* Value Badges Editor */}
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-400">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-650 dark:text-zinc-400">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2">
               Value Badges Bar (Free Delivery, Returns, etc.)
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Badge 1 */}
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 1 Title</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 1 Title</label>
                 <input
                   type="text"
                   value={(config as any).service1Title || ""}
                   placeholder="Free Shipping"
                   onChange={(e) => handleConfigChange("service1Title", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 1 Description</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 1 Description</label>
                 <input
                   type="text"
                   value={(config as any).service1Desc || ""}
                   placeholder="On all orders above ₹2000"
                   onChange={(e) => handleConfigChange("service1Desc", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               
               {/* Badge 2 */}
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 2 Title</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 2 Title</label>
                 <input
                   type="text"
                   value={(config as any).service2Title || ""}
                   placeholder="7 Days Returns"
                   onChange={(e) => handleConfigChange("service2Title", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 2 Description</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 2 Description</label>
                 <input
                   type="text"
                   value={(config as any).service2Desc || ""}
                   placeholder="Easy return & exchange request"
                   onChange={(e) => handleConfigChange("service2Desc", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               
               {/* Badge 3 */}
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 3 Title</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 3 Title</label>
                 <input
                   type="text"
                   value={(config as any).service3Title || ""}
                   placeholder="Secure Payments"
                   onChange={(e) => handleConfigChange("service3Title", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 3 Description</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 3 Description</label>
                 <input
                   type="text"
                   value={(config as any).service3Desc || ""}
                   placeholder="Stripe, Razorpay, UPI & COD"
                   onChange={(e) => handleConfigChange("service3Desc", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               
               {/* Badge 4 */}
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 4 Title</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 4 Title</label>
                 <input
                   type="text"
                   value={(config as any).service4Title || ""}
                   placeholder="100% Genuine"
                   onChange={(e) => handleConfigChange("service4Title", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-500 uppercase">Badge 4 Description</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Badge 4 Description</label>
                 <input
                   type="text"
                   value={(config as any).service4Desc || ""}
                   placeholder="Pure silks, linens & cottons"
                   onChange={(e) => handleConfigChange("service4Desc", e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded text-white"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
             </div>

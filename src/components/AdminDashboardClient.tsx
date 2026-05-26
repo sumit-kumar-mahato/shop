@@ -30,69 +30,69 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
+      <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
-          <h1 className="serif-header text-2xl font-bold tracking-wide uppercase text-white flex items-center gap-2">
+          <h1 className="serif-header text-2xl font-bold tracking-wide uppercase text-zinc-900 dark:text-white flex items-center gap-2">
             <Sparkles className="text-luxury-gold w-5 h-5 animate-pulse" /> Prabodh Clothing Hub
           </h1>
-          <p className="text-xs text-zinc-400 font-light mt-0.5">Real-time overview of clothing retail store performance.</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-light mt-0.5">Real-time overview of clothing retail store performance.</p>
         </div>
       </div>
 
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Revenue */}
-        <div className="bg-zinc-900/90 border border-zinc-850 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(197,168,128,0.1)] hover:border-luxury-gold/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
+        <div className="bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-855 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(197,168,128,0.1)] hover:border-luxury-gold/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-24 h-24 bg-luxury-gold/5 rounded-full blur-2xl group-hover:bg-luxury-gold/10 transition-all duration-500" />
-          <div className="flex justify-between items-center text-zinc-400">
+          <div className="flex justify-between items-center text-zinc-500 dark:text-zinc-400">
             <span className="text-[10px] font-bold tracking-widest uppercase">Total Revenue</span>
             <div className="bg-luxury-gold/10 p-2 rounded-full text-luxury-gold">
               <TrendingUp size={14} />
             </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-white">₹{stats.totalRevenue.toLocaleString("en-IN")}</p>
-          <span className="text-[9px] text-green-500 font-medium tracking-wide flex items-center gap-1">
+          <p className="text-2xl font-bold font-mono text-zinc-900 dark:text-white">₹{stats.totalRevenue.toLocaleString("en-IN")}</p>
+          <span className="text-[9px] text-green-600 dark:text-green-500 font-medium tracking-wide flex items-center gap-1">
             <CheckCircle size={10} /> 100% SECURE TRANSACTIONS
           </span>
         </div>
 
         {/* Orders */}
-        <div className="bg-zinc-900/90 border border-zinc-850 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(197,168,128,0.1)] hover:border-luxury-gold/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
+        <div className="bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-855 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(197,168,128,0.1)] hover:border-luxury-gold/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-24 h-24 bg-luxury-gold/5 rounded-full blur-2xl group-hover:bg-luxury-gold/10 transition-all duration-500" />
-          <div className="flex justify-between items-center text-zinc-400">
+          <div className="flex justify-between items-center text-zinc-500 dark:text-zinc-400">
             <span className="text-[10px] font-bold tracking-widest uppercase">Total Orders</span>
             <div className="bg-luxury-gold/10 p-2 rounded-full text-luxury-gold">
               <ShoppingBag size={14} />
             </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-white">{stats.totalOrders}</p>
-          <span className="text-[9px] text-zinc-400 font-light uppercase tracking-widest">COD & ONLINE CONVERSIONS</span>
+          <p className="text-2xl font-bold font-mono text-zinc-900 dark:text-white">{stats.totalOrders}</p>
+          <span className="text-[9px] text-zinc-500 dark:text-zinc-400 font-light uppercase tracking-widest">COD & ONLINE CONVERSIONS</span>
         </div>
 
         {/* Products */}
-        <div className="bg-zinc-900/90 border border-zinc-850 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(197,168,128,0.1)] hover:border-luxury-gold/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
+        <div className="bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-855 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(197,168,128,0.1)] hover:border-luxury-gold/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-24 h-24 bg-luxury-gold/5 rounded-full blur-2xl group-hover:bg-luxury-gold/10 transition-all duration-500" />
-          <div className="flex justify-between items-center text-zinc-400">
+          <div className="flex justify-between items-center text-zinc-500 dark:text-zinc-400">
             <span className="text-[10px] font-bold tracking-widest uppercase">Active Catalog</span>
             <div className="bg-luxury-gold/10 p-2 rounded-full text-luxury-gold">
               <Users size={14} />
             </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-white">{stats.totalProducts}</p>
-          <span className="text-[9px] text-zinc-400 font-light uppercase tracking-widest">Seeded Luxury Styles</span>
+          <p className="text-2xl font-bold font-mono text-zinc-900 dark:text-white">{stats.totalProducts}</p>
+          <span className="text-[9px] text-zinc-500 dark:text-zinc-400 font-light uppercase tracking-widest">Seeded Luxury Styles</span>
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-zinc-900/90 border border-zinc-850 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(239,68,68,0.1)] hover:border-red-500/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
+        <div className="bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-855 hover:-translate-y-1 transition-all duration-300 hover:shadow-[0_0_25px_rgba(239,68,68,0.1)] hover:border-red-500/50 p-6 rounded-sm space-y-3 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl group-hover:bg-red-500/10 transition-all duration-500" />
-          <div className="flex justify-between items-center text-zinc-400">
+          <div className="flex justify-between items-center text-zinc-500 dark:text-zinc-400">
             <span className="text-[10px] font-bold tracking-widest uppercase">Stock Warnings</span>
             <div className={`p-2 rounded-full ${stats.lowStockCount > 0 ? "bg-red-500/10 text-red-500" : "bg-green-500/10 text-green-500"}`}>
               <BellRing size={14} />
             </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-white">{stats.lowStockCount}</p>
-          <span className={`text-[9px] font-bold uppercase tracking-wider ${stats.lowStockCount > 0 ? "text-red-500 animate-pulse" : "text-green-500"}`}>
+          <p className="text-2xl font-bold font-mono text-zinc-900 dark:text-white">{stats.lowStockCount}</p>
+          <span className={`text-[9px] font-bold uppercase tracking-wider ${stats.lowStockCount > 0 ? "text-red-500 animate-pulse" : "text-green-600 dark:text-green-500"}`}>
             {stats.lowStockCount > 0 ? "REPLENISH APPAREL SOON" : "INVENTORY HEALTHY"}
           </span>
         </div>
@@ -101,9 +101,9 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
       {/* Three Columns Layout: Charts & Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Monthly Revenue Trend Chart (SVG) */}
-        <div className="lg:col-span-2 bg-zinc-900 border border-zinc-850 p-6 rounded-sm space-y-6 flex flex-col justify-between hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-shadow duration-300">
+        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 p-6 rounded-sm space-y-6 flex flex-col justify-between hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-shadow duration-300">
           <div className="flex justify-between items-center">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-300">Monthly Revenue Performance</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Monthly Revenue Performance</h3>
             <span className="text-[10px] bg-luxury-gold/15 text-luxury-gold px-2.5 py-0.5 rounded font-bold uppercase">
               REVENUE IN INR (₹)
             </span>
@@ -112,10 +112,10 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
           <div className="relative h-48 w-full pt-4">
             <svg className="w-full h-[90%]" viewBox="0 0 500 200" preserveAspectRatio="none">
               {/* Grid Lines */}
-              <line x1="0" y1="50" x2="500" y2="50" stroke="#27272a" strokeWidth="1" strokeDasharray="4" />
-              <line x1="0" y1="100" x2="500" y2="100" stroke="#27272a" strokeWidth="1" strokeDasharray="4" />
-              <line x1="0" y1="150" x2="500" y2="150" stroke="#27272a" strokeWidth="1" strokeDasharray="4" />
-              <line x1="0" y1="190" x2="500" y2="190" stroke="#3f3f46" strokeWidth="1" />
+              <line x1="0" y1="50" x2="500" y2="50" stroke="currentColor" className="stroke-zinc-100 dark:stroke-zinc-800" strokeWidth="1" strokeDasharray="4" />
+              <line x1="0" y1="100" x2="500" y2="100" stroke="currentColor" className="stroke-zinc-100 dark:stroke-zinc-800" strokeWidth="1" strokeDasharray="4" />
+              <line x1="0" y1="150" x2="500" y2="150" stroke="currentColor" className="stroke-zinc-100 dark:stroke-zinc-800" strokeWidth="1" strokeDasharray="4" />
+              <line x1="0" y1="190" x2="500" y2="190" stroke="currentColor" className="stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1" />
 
               {/* Bars with gold glowing gradients */}
               <rect x="30" y={190 - (45000 / 180000) * 160} width="35" height={(45000 / 180000) * 160} fill="url(#goldGradient)" rx="3" className="transition-all duration-300 hover:fill-[#d5b890]" />
@@ -148,7 +148,7 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
               </defs>
             </svg>
             {/* X Axis Labels */}
-            <div className="flex justify-between px-6 pt-1 text-[10px] font-bold text-zinc-500 uppercase tracking-widest font-mono">
+            <div className="flex justify-between px-6 pt-1 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-mono">
               <span>Jan</span>
               <span>Feb</span>
               <span>Mar</span>
@@ -159,16 +159,16 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
         </div>
 
         {/* Category breakdown sales list */}
-        <div className="bg-zinc-900 border border-zinc-850 p-6 rounded-sm space-y-6 flex flex-col justify-between hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-shadow duration-300">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-300">Share by Category</h3>
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 p-6 rounded-sm space-y-6 flex flex-col justify-between hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-shadow duration-300">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Share by Category</h3>
           <div className="space-y-4 flex-grow flex flex-col justify-center">
             {categorySales.map((cat) => (
               <div key={cat.name} className="space-y-1.5">
                 <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-zinc-300 uppercase tracking-wider">{cat.name}</span>
+                  <span className="text-zinc-650 dark:text-zinc-300 uppercase tracking-wider">{cat.name}</span>
                   <span className="text-luxury-gold font-bold font-mono">{cat.value} ({cat.percent}%)</span>
                 </div>
-                <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
                   <div
                     className="bg-luxury-gold h-full transition-all duration-1000"
                     style={{ width: `${cat.percent}%` }}
@@ -179,13 +179,12 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
           </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Low Stock Warnings list */}
-        <div className="lg:col-span-1 bg-zinc-900 border border-zinc-850 p-6 rounded-sm space-y-6 hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-shadow duration-300">
+        <div className="lg:col-span-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 p-6 rounded-sm space-y-6 hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.02)] transition-shadow duration-300">
           <div className="flex items-center gap-2 text-red-500">
             <AlertTriangle size={15} />
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-300">Stock Notifications</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Stock Notifications</h3>
           </div>
 
           {lowStockProducts.length === 0 ? (
@@ -193,14 +192,14 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
               All apparel categories are fully replenished.
             </div>
           ) : (
-            <div className="divide-y divide-zinc-800/80 max-h-56 overflow-y-auto pr-1">
+            <div className="divide-y divide-zinc-200 dark:divide-zinc-800/80 max-h-56 overflow-y-auto pr-1">
               {lowStockProducts.map((p) => (
                 <div key={p.id} className="py-3 flex justify-between items-center text-xs">
                   <div className="min-w-0">
-                    <h4 className="font-semibold text-zinc-300 truncate w-36 uppercase">{p.title}</h4>
-                    <p className="text-[10px] text-zinc-500 font-mono mt-0.5">SKU: {p.sku}</p>
+                    <h4 className="font-semibold text-zinc-800 dark:text-zinc-300 truncate w-36 uppercase">{p.title}</h4>
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-500 font-mono mt-0.5">SKU: {p.sku}</p>
                   </div>
-                  <span className="text-[10px] bg-red-950/20 text-red-500 border border-red-800/40 px-2.5 py-1 rounded font-bold font-mono">
+                  <span className="text-[10px] bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-500 border border-red-200 dark:border-red-800/40 px-2.5 py-1 rounded font-bold font-mono">
                     Stock: {p.stock}
                   </span>
                 </div>
@@ -210,18 +209,18 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
         </div>
 
       {/* Recent Orders Table */}
-      <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 p-6 rounded-sm space-y-6">
+      <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-300">Recent Customer Invoices</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Recent Customer Invoices</h3>
           <Link href="/admin/orders" className="text-[11px] font-bold text-luxury-gold hover:underline flex items-center gap-1">
             VIEW ALL TRANSACTIONS <ChevronRight size={13} />
           </Link>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-xs font-light text-left border-collapse text-zinc-400">
+          <table className="w-full text-xs font-light text-left border-collapse text-zinc-500 dark:text-zinc-400">
             <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400 uppercase font-semibold text-[10px] tracking-wider">
+              <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 uppercase font-semibold text-[10px] tracking-wider">
                 <th className="py-3">Invoice</th>
                 <th className="py-3">Client</th>
                 <th className="py-3">Address</th>
@@ -230,16 +229,16 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
                 <th className="py-3 text-right">Value</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800">
+            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {recentOrders.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-6 text-center text-zinc-500 italic">No customer orders recorded yet.</td>
                 </tr>
               ) : (
                 recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-zinc-800/20 transition-colors">
+                  <tr key={order.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors">
                     <td className="py-3 font-semibold text-luxury-gold font-mono uppercase">{order.orderNumber}</td>
-                    <td className="py-3 font-medium text-zinc-200">{order.customerName}</td>
+                    <td className="py-3 font-medium text-zinc-800 dark:text-zinc-200">{order.customerName}</td>
                     <td className="py-3 truncate max-w-[150px]">{order.address}, {order.city}</td>
                     <td className="py-3">
                       {new Date(order.createdAt).toLocaleDateString("en-IN", {
@@ -251,16 +250,16 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
                     <td className="py-3">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${
                         order.status === "Delivered"
-                          ? "bg-green-950/20 border border-green-800/40 text-green-500"
+                          ? "bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-500"
                           : order.status === "Shipped"
-                          ? "bg-blue-950/20 border border-blue-800/40 text-blue-500 animate-pulse"
-                          : "bg-amber-950/20 border border-amber-800/40 text-amber-500"
+                          ? "bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/40 text-blue-700 dark:text-blue-500 animate-pulse"
+                          : "bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 text-amber-700 dark:text-amber-500"
                       }`}>
                         {order.status === "Delivered" && <CheckCircle size={10} />}
                         {order.status}
                       </span>
                     </td>
-                    <td className="py-3 text-right font-bold text-zinc-200">₹{order.finalTotal}</td>
+                    <td className="py-3 text-right font-bold text-zinc-800 dark:text-zinc-200">₹{order.finalTotal}</td>
                   </tr>
                 ))
               )}
@@ -269,8 +268,7 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default AdminDashboardClient;

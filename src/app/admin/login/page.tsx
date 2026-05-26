@@ -40,9 +40,9 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col justify-center items-center px-4 relative font-sans">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center items-center px-4 relative font-sans transition-colors duration-300">
       {/* Background radial gradient accent */}
-      <div className="absolute w-[500px] h-[500px] rounded-full bg-luxury-gold/5 blur-[120px] pointer-events-none" />
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-luxury-gold/[0.03] dark:bg-luxury-gold/5 blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-md space-y-8 z-10">
         {/* Brand Header */}
@@ -50,30 +50,30 @@ export default function AdminLoginPage() {
           <span className="text-[10px] font-bold tracking-widest text-luxury-gold uppercase border-b border-luxury-gold/30 pb-1">
             Secure Control Center
           </span>
-          <h1 className="font-display font-bold tracking-widest text-2xl text-white uppercase mt-4">
+          <h1 className="font-display font-bold tracking-widest text-2xl text-zinc-900 dark:text-white uppercase mt-4">
             PRABODH KUMAR MAHATO
           </h1>
-          <p className="text-xs text-zinc-400 font-light">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-light">
             Please authorize to access the visual CMS boutique manager.
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-zinc-900/60 border border-zinc-800/80 backdrop-blur-xl p-8 rounded-sm shadow-xl space-y-6">
+        <div className="bg-white/80 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 backdrop-blur-xl p-8 rounded-sm shadow-xl dark:shadow-2xl space-y-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-950/40 border border-red-900/50 text-red-200 text-xs px-4 py-3 rounded-sm text-center">
+              <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-650 dark:text-red-200 text-xs px-4 py-3 rounded-sm text-center">
                 {error}
               </div>
             )}
 
             {/* Username field */}
             <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Username Reference
               </label>
               <div className="relative flex items-center">
-                <span className="absolute left-3.5 text-zinc-500">
+                <span className="absolute left-3.5 text-zinc-400 dark:text-zinc-500">
                   <User size={15} />
                 </span>
                 <input
@@ -82,18 +82,18 @@ export default function AdminLoginPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter administrator name"
-                  className="w-full bg-zinc-950 border border-zinc-800 text-xs text-white rounded px-4 py-3 pl-10 focus:outline-none focus:border-luxury-gold transition-colors"
+                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-white rounded px-4 py-3 pl-10 focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold transition-colors"
                 />
               </div>
             </div>
 
             {/* Password field */}
             <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Security Key
               </label>
               <div className="relative flex items-center">
-                <span className="absolute left-3.5 text-zinc-500">
+                <span className="absolute left-3.5 text-zinc-400 dark:text-zinc-500">
                   <Lock size={15} />
                 </span>
                 <input
@@ -102,12 +102,12 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter security key"
-                  className="w-full bg-zinc-950 border border-zinc-800 text-xs text-white rounded px-4 py-3 pl-10 pr-10 focus:outline-none focus:border-luxury-gold transition-colors font-mono"
+                  className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-white rounded px-4 py-3 pl-10 pr-10 focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold transition-colors font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 text-zinc-500 hover:text-zinc-300 transition-colors"
+                  className="absolute right-3.5 text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
         <div className="text-center">
           <a
             href="/"
-            className="text-[10px] tracking-widest text-zinc-500 hover:text-luxury-gold uppercase transition-colors"
+            className="text-[10px] tracking-widest text-zinc-400 dark:text-zinc-500 hover:text-luxury-gold uppercase transition-colors"
           >
             ← Cancel & Return to Storefront
           </a>

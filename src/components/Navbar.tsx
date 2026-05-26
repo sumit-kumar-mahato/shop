@@ -86,10 +86,10 @@ const Navbar: React.FC<NavbarProps> = ({ logoText, contactEmail }) => {
   if (isAdminPage) {
     // Admin header: minimal, focusing on visual dashboard management
     return (
-      <header className="fixed top-0 left-0 w-full z-50 bg-zinc-900 border-b border-zinc-800 text-white h-16 flex items-center justify-between px-6">
+      <header className="fixed top-0 left-0 w-full z-50 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-white h-16 flex items-center justify-between px-6 transition-colors duration-300">
         <div className="flex items-center gap-3">
           <Link href="/" className="font-display font-bold tracking-widest text-lg hover:text-luxury-gold transition-colors">
-            {logoText} <span className="text-xs bg-zinc-800 border border-zinc-700 text-luxury-gold px-2 py-0.5 rounded ml-2 font-mono uppercase">Storefront</span>
+            {logoText} <span className="text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-luxury-gold px-2 py-0.5 rounded ml-2 font-mono uppercase">Storefront</span>
           </Link>
         </div>
         <div className="flex items-center gap-4">
@@ -98,7 +98,7 @@ const Navbar: React.FC<NavbarProps> = ({ logoText, contactEmail }) => {
           </span>
           <button
             onClick={toggleDarkMode}
-            className="p-2 hover:bg-zinc-800 rounded-full transition-colors text-zinc-400 hover:text-white"
+            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
             title="Toggle Theme"
           >
             {darkMode ? <Sun size={18} /> : <Moon size={18} />}

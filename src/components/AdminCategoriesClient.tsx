@@ -71,10 +71,10 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
+      <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
-          <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-white">Categories Manager</h1>
-          <p className="text-xs text-zinc-400 font-light mt-0.5">Edit and create store department categories.</p>
+          <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-zinc-900 dark:text-white">Categories Manager</h1>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-light mt-0.5">Edit and create store department categories.</p>
         </div>
         <button
           onClick={() => setModalOpen(true)}
@@ -88,7 +88,7 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
         {categories.map((cat) => (
           <div
             key={cat.id}
-            className="group relative h-48 overflow-hidden rounded-sm bg-zinc-900 border border-zinc-800 flex flex-col justify-end p-4 shadow-sm"
+            className="group relative h-48 overflow-hidden rounded-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-end p-4 shadow-sm"
           >
             <div
               className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-103 transition-transform duration-300"
@@ -104,7 +104,7 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
               </div>
               <button
                 onClick={() => handleDelete(cat.id)}
-                className="p-2 hover:bg-zinc-800 text-zinc-400 hover:text-red-500 rounded transition-colors"
+                className="p-2 hover:bg-zinc-800/40 text-zinc-300 hover:text-red-500 rounded transition-colors"
                 title="Delete Category"
               >
                 <Trash2 size={14} />
@@ -118,35 +118,35 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
-          <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 p-6 rounded shadow-2xl z-10 space-y-6">
-            <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
-              <h3 className="serif-header text-lg uppercase tracking-wider text-white font-bold flex items-center gap-2">
+          <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded shadow-2xl z-10 space-y-6">
+            <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3">
+              <h3 className="serif-header text-lg uppercase tracking-wider text-zinc-900 dark:text-white font-bold flex items-center gap-2">
                 <FolderTree size={18} className="text-luxury-gold" /> Add Category
               </h3>
-              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-zinc-800 rounded">
+              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-500 dark:text-zinc-400">
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleCreate} className="space-y-4 text-xs">
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-400 uppercase">Category Name</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Category Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Ethnic Wear"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white uppercase font-bold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white uppercase font-bold"
                   required
                 />
               </div>
 
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-400 uppercase">Gender Tag</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Gender Tag</label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-300"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-800 dark:text-zinc-300"
                 >
                   <option value="Men">Men</option>
                   <option value="Women">Women</option>
@@ -157,13 +157,13 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
               </div>
 
               <div className="flex flex-col space-y-1.5">
-                <label className="text-[9px] font-bold text-zinc-400 uppercase">Cover Image Link (URL)</label>
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Cover Image Link (URL)</label>
                 <input
                   type="text"
                   placeholder="https://images.unsplash.com/..."
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
-                  className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                   required
                 />
               </div>
@@ -172,7 +172,7 @@ export default function AdminCategoriesClient({ initialCategories }: AdminCatego
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="w-1/2 border border-zinc-800 text-zinc-400 font-bold hover:bg-zinc-800/20 py-2.5 uppercase rounded-sm"
+                  className="w-1/2 border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 py-2.5 uppercase rounded-sm"
                 >
                   CANCEL
                 </button>
