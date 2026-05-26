@@ -4,6 +4,14 @@ An enterprise-grade, luxury-designed fashion storefront and integrated visual ad
 
 ---
 
+## 🌐 Live Production Links (Online)
+* **Client Storefront:** [https://shop-silk-zeta.vercel.app](https://shop-silk-zeta.vercel.app)
+* **Secure Admin CMS Dashboard:** [https://shop-silk-zeta.vercel.app/admin](https://shop-silk-zeta.vercel.app/admin)
+  * *Username:* `admin`
+  * *Password:* `prabodh2026`
+
+---
+
 ## 💎 Design Philosophy & Aesthetic Details
 - **Luxury Branding:** Styled with an elegant dark/light theme, custom Outfit & Serif typography (Playfair Display), premium card layouts, and subtle transition micro-interactions.
 - **Mobile-First Responsive:** Crafted for mobile screens, tablets, and desktops.
