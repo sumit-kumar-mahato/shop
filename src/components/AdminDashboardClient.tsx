@@ -268,6 +268,7 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

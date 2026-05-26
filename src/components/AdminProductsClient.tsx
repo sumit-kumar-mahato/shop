@@ -345,7 +345,8 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
         </div>
       </div>
 
-      {/* Editor Modal Overlay */      {modalOpen && (
+      {/* Editor Modal Overlay */}
+      {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
           <div className="relative w-full max-w-5xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded shadow-2xl z-10 space-y-6 max-h-[95vh] overflow-y-auto">
