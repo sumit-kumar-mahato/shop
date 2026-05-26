@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ShieldCheck, Truck, RotateCcw, FileText } from "lucide-react";
 
-export default function PolicyPage() {
+function PolicyPageContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
 
@@ -149,5 +149,13 @@ export default function PolicyPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function PolicyPage() {
+  return (
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-20 text-center text-xs tracking-widest text-luxury-500 uppercase">Loading documents...</div>}>
+      <PolicyPageContent />
+    </Suspense>
   );
 }
