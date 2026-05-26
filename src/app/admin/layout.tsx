@@ -18,6 +18,21 @@ import {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/admin/logout", { method: "POST" });
+      if (res.ok) {
+        window.location.href = "/admin/login";
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const menuItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Products Manager", href: "/admin/products", icon: ShoppingBag },
@@ -68,6 +83,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <Eye size={14} /> Live Storefront
           </Link>
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center gap-2 w-full bg-red-950/40 hover:bg-red-900/60 border border-red-900/40 text-red-200 font-semibold text-xs tracking-wider py-2.5 rounded transition-all uppercase"
+          >
+            <LogOut size={14} /> Log Out
+          </button>
         </div>
       </aside>
 
