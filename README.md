@@ -1,4 +1,4 @@
-# Avant-Garde Clothing Retail eCommerce & Visual CMS
+# Prabodh Kumar Mahato Clothing Storefront & Visual CMS
 
 An enterprise-grade, luxury-designed fashion storefront and integrated visual admin CMS. Designed specifically for clothing retail business owners to visually manage catalog inventories, banner advertisements, homepage order structures, coupons, client details, and order invoices **without writing any code**.
 
@@ -14,7 +14,7 @@ An enterprise-grade, luxury-designed fashion storefront and integrated visual ad
 
 ## 🛠️ Technology Stack
 - **Frontend / Storefront:** Next.js (App Router, Server-side Rendering + Client interactivity), React, Tailwind CSS, Lucide Icons, Canvas Confetti.
-- **Database Engine:** SQLite (local development zero-configuration file `dev.db`), swappable to PostgreSQL or MongoDB for production via Prisma.
+- **Database Engine:** PostgreSQL (Cloud persistent database via Supabase connection pooler).
 - **ORM / Schema Tool:** Prisma Client.
 - **Deployment & Sandbox:** Docker Containerization via `docker-compose`.
 
@@ -24,7 +24,7 @@ An enterprise-grade, luxury-designed fashion storefront and integrated visual ad
 ```
 C:\Users\Lenovo\Desktop\SHOP\
 ├── prisma/
-│   ├── schema.prisma      # Prisma SQLite model structures (Product, Order, Category, Blog, Coupon, CMSConfig)
+│   ├── schema.prisma      # Prisma PostgreSQL model structures (Product, Order, Category, Blog, Coupon, CMSConfig)
 │   └── seed.ts            # High-quality dummy clothing catalog items (French linens, sarees, chinos, velvet sets)
 ├── src/
 │   ├── app/
@@ -88,15 +88,8 @@ docker compose down
 
 ---
 
-## ⚙️ Switch to PostgreSQL (Production Deployment)
-When deploying to production hosts (Vercel, Neon, Supabase):
-1. In `prisma/schema.prisma`, change the `datasource` block:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-2. Set your production PostgreSQL database URL in your environment variables:
-   `DATABASE_URL="postgresql://username:password@hostname:5432/dbname?sslmode=require"`
-3. Execute `npx prisma db push` to generate database structures on the cloud server.
+## ⚙️ Cloud Deployment (Vercel & Supabase)
+This project is fully ready for zero-downtime, 100% free cloud deployment:
+1. Pushed to your personal GitHub repository.
+2. Connected to a **Supabase PostgreSQL** database using the connection pooler.
+3. Deployed on **Vercel** with automatic schema creation, table migrations, and catalog seeding during build time.
