@@ -1,0 +1,251 @@
+"use client";
+
+import React, { useState } from "react";
+import { Settings, Save, ShieldAlert } from "lucide-react";
+import confetti from "canvas-confetti";
+
+interface AdminSettingsClientProps {
+  initialSettings: {
+    storeName: string;
+    logoText: string;
+    primaryColor: string;
+    secondaryColor: string;
+    contactPhone: string;
+    contactEmail: string;
+    address: string;
+    seoTitle: string;
+    seoDescription: string;
+    banners: any[];
+    sectionsOrder: string[];
+    promoHighlight: any;
+  };
+}
+
+export default function AdminSettingsClient({ initialSettings }: AdminSettingsClientProps) {
+  const [settings, setSettings] = useState(initialSettings);
+  const [saving, setSaving] = useState(false);
+
+  const handleFieldChange = (key: string, val: string) => {
+    setSettings((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+
+    try {
+      const res = await fetch("/api/cms/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+
+      if (res.ok) {
+        confetti({
+          particleCount: 50,
+          spread: 30,
+          origin: { y: 0.8 },
+          colors: ["#c5a880", "#ffffff"],
+        });
+      } else {
+        alert("Failed to save website configurations.");
+      }
+    } catch (e) {
+      alert("Error saving settings.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-6 text-xs font-light text-zinc-400">
+        <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
+          <div>
+            <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-white">Website & Theme Settings</h1>
+            <p className="text-xs text-zinc-400 font-light mt-0.5">Visually edit branding, meta descriptions, and contacts.</p>
+          </div>
+          <button
+            type="submit"
+            disabled={saving}
+            className="bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-950 font-bold text-xs tracking-wider py-3 px-6 rounded flex items-center gap-1.5 uppercase transition-all active:scale-95 flex-shrink-0"
+          >
+            <Save size={16} /> {saving ? "SAVING..." : "SAVE SETTINGS"}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* General Branding */}
+          <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-sm space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2">
+              General Branding
+            </h3>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase">Store Name</label>
+              <input
+                type="text"
+                value={settings.storeName}
+                onChange={(e) => handleFieldChange("storeName", e.target.value)}
+                className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-bold"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase">Logo Brand Text</label>
+              <input
+                type="text"
+                value={settings.logoText}
+                onChange={(e) => handleFieldChange("logoText", e.target.value)}
+                className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-bold font-mono tracking-widest"
+                required
+              />
+            </div>
+
+            {/* Custom Theme Colors */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="flex flex-col space-y-1.5 col-span-2 sm:col-span-1">
+                <label className="text-[9px] font-bold text-zinc-500 uppercase">Primary theme Color</label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={settings.primaryColor.startsWith("#") && settings.primaryColor.length === 7 ? settings.primaryColor : "#c5a880"}
+                    onChange={(e) => handleFieldChange("primaryColor", e.target.value)}
+                    className="w-10 h-10 border border-zinc-800 bg-transparent rounded cursor-pointer p-0"
+                  />
+                  <input
+                    type="text"
+                    value={settings.primaryColor}
+                    onChange={(e) => handleFieldChange("primaryColor", e.target.value)}
+                    className="flex-grow bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-mono font-bold text-center"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-1.5 col-span-2 sm:col-span-1">
+                <label className="text-[9px] font-bold text-zinc-500 uppercase">Secondary Accent Color</label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={settings.secondaryColor.startsWith("#") && settings.secondaryColor.length === 7 ? settings.secondaryColor : "#111827"}
+                    onChange={(e) => handleFieldChange("secondaryColor", e.target.value)}
+                    className="w-10 h-10 border border-zinc-800 bg-transparent rounded cursor-pointer p-0"
+                  />
+                  <input
+                    type="text"
+                    value={settings.secondaryColor}
+                    onChange={(e) => handleFieldChange("secondaryColor", e.target.value)}
+                    className="flex-grow bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-mono font-bold text-center"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Presets Gallery */}
+            <div className="pt-2 space-y-2 border-t border-zinc-850">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">Preset Designer Themes</label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { name: "Luxury Gold", primary: "#c5a880", secondary: "#111827" },
+                  { name: "Royal Emerald", primary: "#10b981", secondary: "#064e3b" },
+                  { name: "Crimson Silk", primary: "#dc2626", secondary: "#450a0a" },
+                  { name: "Midnight Purple", primary: "#8b5cf6", secondary: "#1e1b4b" }
+                ].map((preset) => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => {
+                      setSettings((prev) => ({
+                        ...prev,
+                        primaryColor: preset.primary,
+                        secondaryColor: preset.secondary
+                      }));
+                    }}
+                    className="flex items-center gap-2.5 bg-zinc-950 border border-zinc-800 hover:border-luxury-gold p-2.5 rounded transition-all text-left"
+                  >
+                    <div className="flex gap-1">
+                      <span className="w-3.5 h-3.5 rounded-full border border-zinc-850" style={{ backgroundColor: preset.primary }} />
+                      <span className="w-3.5 h-3.5 rounded-full border border-zinc-850" style={{ backgroundColor: preset.secondary }} />
+                    </div>
+                    <span className="text-[9px] text-zinc-300 font-bold uppercase tracking-wider">{preset.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-sm space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2">
+              Store Contacts
+            </h3>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase">Concierge Email</label>
+              <input
+                type="email"
+                value={settings.contactEmail}
+                onChange={(e) => handleFieldChange("contactEmail", e.target.value)}
+                className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-mono"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase">Store Hotline Phone</label>
+              <input
+                type="text"
+                value={settings.contactPhone}
+                onChange={(e) => handleFieldChange("contactPhone", e.target.value)}
+                className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase">Boutique Galleria Address</label>
+              <input
+                type="text"
+                value={settings.address}
+                onChange={(e) => handleFieldChange("address", e.target.value)}
+                className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                required
+              />
+            </div>
+          </div>
+
+          {/* SEO Metadata Settings */}
+          <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-sm space-y-4 md:col-span-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-white border-b border-zinc-800 pb-2">
+              SEO Google Metadata Settings
+            </h3>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase">Homepage Browser Tab title (SEO Title)</label>
+              <input
+                type="text"
+                value={settings.seoTitle}
+                onChange={(e) => handleFieldChange("seoTitle", e.target.value)}
+                className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 uppercase">Google Snippet description (SEO Description)</label>
+              <textarea
+                value={settings.seoDescription}
+                onChange={(e) => handleFieldChange("seoDescription", e.target.value)}
+                rows={3}
+                className="bg-zinc-950 border border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-white font-light"
+                required
+              />
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}

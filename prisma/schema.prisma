@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                 String   @id @default(uuid())
+  title              String
+  description        String
+  price              Float
+  compareAtPrice     Float?   // Original price before discount
+  sku                String   @unique
+  stock              Int      @default(0)
+  gender             String   // "Men" | "Women" | "Kids" | "Unisex"
+  categoryName       String
+  images             String   // JSON string of image URLs
+  colors             String   // JSON string of colors (e.g. ["#000000", "#FFFFFF"])
+  sizes              String   // JSON string of sizes (e.g. ["S", "M", "L", "XL"])
+  fabric             String   @default("Cotton")
+  fit                String   @default("Regular")
+  tags               String   // JSON string of tags (e.g. ["casual", "summer"])
+  rating             Float    @default(5.0)
+  isFeatured         Boolean  @default(false)
+  isTrending         Boolean  @default(false)
+  isNewArrival       Boolean  @default(false)
+  isBestSeller       Boolean  @default(false)
+  isFlashSale        Boolean  @default(false)
+  discountPercentage Float    @default(0.0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  reviews            Review[]
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  image     String
+  gender    String   // "Men" | "Women" | "Kids" | "All"
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id             String   @id @default(uuid())
+  orderNumber    String   @unique
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  address        String
+  city           String
+  postalCode     String
+  total          Float
+  gst            Float    @default(0.0)
+  discount       Float    @default(0.0)
+  finalTotal     Float
+  status         String   @default("Processing") // "Processing" | "Shipped" | "Delivered" | "Cancelled"
+  trackingNumber String?
+  paymentMethod  String   @default("COD") // "COD" | "UPI" | "CARD"
+  paymentStatus  String   @default("Pending") // "Pending" | "Paid"
+  invoiceUrl     String?
+  items          String   // JSON string representing ordered items
+  createdAt      DateTime @default(now())
+}
+
+model Coupon {
+  id           String   @id @default(uuid())
+  code         String   @unique
+  discountType String   // "PERCENTAGE" | "FIXED"
+  value        Float
+  expiryDate   DateTime
+  active       Boolean  @default(true)
+  usageLimit   Int      @default(100)
+  usageCount   Int      @default(0)
+}
+
+model Review {
+  id            String   @id @default(uuid())
+  customerName  String
+  customerEmail String
+  rating        Int
+  comment       String
+  approved      Boolean  @default(false) // Admin must moderate
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+}
+
+model Blog {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  coverImage  String
+  tags        String   // JSON string of tags
+  author      String   @default("Editor")
+  publishDate DateTime @default(now())
+  readTime    String   @default("5 min read")
+}
+
+model CmsConfig {
+  id    String @id @default(uuid())
+  key   String @unique // e.g. "store_settings"
+  value String // JSON string storing website configurations (hero banner, layout, styling colors, logo, etc.)
+}

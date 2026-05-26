@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: luxury_fashion_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local_password
+      POSTGRES_DB: luxury_shop
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  shop:
+    build: .
+    container_name: luxury_fashion_store
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:local_password@db:5432/luxury_shop?sslmode=disable
+      - PORT=3000
+      - NODE_ENV=development
+    volumes:
+      - ./prisma:/app/prisma
+      - ./src:/app/src
+      - ./public:/app/public
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  pgdata:
