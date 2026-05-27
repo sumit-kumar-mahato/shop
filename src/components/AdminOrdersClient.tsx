@@ -154,7 +154,7 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
             onClick={() => setFilterStatus(pill.value)}
             className={`px-3 py-1.5 rounded transition-all ${
               filterStatus === pill.value
-                ? "bg-luxury-gold text-zinc-955"
+                ? "bg-luxury-gold text-zinc-950"
                 : "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
             }`}
           >

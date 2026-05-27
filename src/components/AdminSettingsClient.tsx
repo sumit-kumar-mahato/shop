@@ -72,7 +72,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
           <button
             type="submit"
             disabled={saving}
-            className="bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-955 font-bold text-xs tracking-wider py-3 px-6 rounded flex items-center gap-1.5 uppercase transition-all active:scale-95 flex-shrink-0"
+            className="bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-950 font-bold text-xs tracking-wider py-3 px-6 rounded flex items-center gap-1.5 uppercase transition-all active:scale-95 flex-shrink-0"
           >
             <Save size={16} /> {saving ? "SAVING..." : "SAVE SETTINGS"}
           </button>

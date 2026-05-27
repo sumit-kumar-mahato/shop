@@ -168,7 +168,7 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
                   key={sectionId}
                   className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 p-3 rounded flex justify-between items-center text-xs text-zinc-700 dark:text-zinc-300"
                 >
-                  <span className="font-semibold uppercase truncate w-40 text-zinc-800 dark:text-zinc-250">
+                  <span className="font-semibold uppercase truncate w-40 text-zinc-800 dark:text-zinc-200">
                     {sectionLabels[sectionId] || sectionId}
                   </span>
                   <div className="flex gap-1.5 flex-shrink-0">
@@ -203,7 +203,7 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
             <button
               type="button"
               onClick={handleAddBanner}
-              className="bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-955 font-bold text-[10px] tracking-widest py-2.5 px-4 rounded-sm flex items-center gap-1.5 uppercase transition-all"
+              className="bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-[10px] tracking-widest py-2.5 px-4 rounded-sm flex items-center gap-1.5 uppercase transition-all"
             >
               <Plus size={12} /> Add New Slide
             </button>

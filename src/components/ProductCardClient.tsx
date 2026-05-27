@@ -107,7 +107,7 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
 
         {/* Badges */}
         {discountPercentage > 0 && (
-          <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-955 text-[9px] font-bold px-2 py-0.5 uppercase rounded-sm z-10">
+          <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-950 text-[9px] font-bold px-2 py-0.5 uppercase rounded-sm z-10">
             -{discountPercentage}%
           </span>
         )}

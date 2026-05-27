@@ -144,7 +144,7 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
               <button
                 onClick={() => setActiveMetric("revenue")}
                 className={`px-3 py-1.5 rounded transition-all ${
-                  activeMetric === "revenue" ? "bg-luxury-gold text-zinc-955" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                  activeMetric === "revenue" ? "bg-luxury-gold text-zinc-950" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                 }`}
               >
                 Revenue
@@ -152,7 +152,7 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
               <button
                 onClick={() => setActiveMetric("orders")}
                 className={`px-3 py-1.5 rounded transition-all ${
-                  activeMetric === "orders" ? "bg-luxury-gold text-zinc-955" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                  activeMetric === "orders" ? "bg-luxury-gold text-zinc-950" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                 }`}
               >
                 Orders
@@ -160,7 +160,7 @@ const AdminDashboardClient: React.FC<AdminDashboardClientProps> = ({
               <button
                 onClick={() => setActiveMetric("aov")}
                 className={`px-3 py-1.5 rounded transition-all ${
-                  activeMetric === "aov" ? "bg-luxury-gold text-zinc-955" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                  activeMetric === "aov" ? "bg-luxury-gold text-zinc-950" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                 }`}
               >
                 AOV

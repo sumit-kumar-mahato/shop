@@ -45,10 +45,10 @@ const Footer: React.FC<FooterProps> = ({
             Luxury apparel, tailored French linen shirts, silk sarees, and modern fashion crafted for premium wardrobes worldwide.
           </p>
           <div className="flex space-x-4 pt-2">
-            <a href={instagramUrl || "https://instagram.com"} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-luxury-800/50 hover:bg-luxury-gold flex items-center justify-center hover:text-zinc-955 transition-all">
+            <a href={instagramUrl || "https://instagram.com"} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-luxury-800/50 hover:bg-luxury-gold flex items-center justify-center hover:text-zinc-950 transition-all">
               <Instagram size={16} />
             </a>
-            <a href={facebookUrl || "https://facebook.com"} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-luxury-800/50 hover:bg-luxury-gold flex items-center justify-center hover:text-zinc-955 transition-all">
+            <a href={facebookUrl || "https://facebook.com"} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-luxury-800/50 hover:bg-luxury-gold flex items-center justify-center hover:text-zinc-950 transition-all">
               <Facebook size={16} />
             </a>
           </div>

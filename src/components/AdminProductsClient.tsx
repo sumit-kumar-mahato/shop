@@ -340,7 +340,7 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
             onClick={() => setFilterStock(pill.value as any)}
             className={`px-3 py-1.5 rounded transition-all ${
               filterStock === pill.value
-                ? "bg-luxury-gold text-zinc-955"
+                ? "bg-luxury-gold text-zinc-950"
                 : "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
             }`}
           >
@@ -623,7 +623,7 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
                   <button
                     type="submit"
                     disabled={saving}
-                    className="w-1/2 bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-955 font-bold py-3 uppercase rounded-sm transition-all"
+                    className="w-1/2 bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-950 font-bold py-3 uppercase rounded-sm transition-all"
                   >
                     {saving ? "SAVING ENTRY..." : "SAVE PRODUCT"}
                   </button>
@@ -645,7 +645,7 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
                       <span className="text-zinc-500 dark:text-zinc-600 text-[10px] uppercase font-mono tracking-widest">No Image Selected</span>
                     )}
                     {compareAtPrice && parseFloat(compareAtPrice) > parseFloat(price) && (
-                      <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-955 text-[9px] font-bold px-2 py-0.5 uppercase rounded-sm">
+                      <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-950 text-[9px] font-bold px-2 py-0.5 uppercase rounded-sm">
                         -{Math.round(((parseFloat(compareAtPrice) - parseFloat(price)) / parseFloat(compareAtPrice)) * 100)}% OFF
                       </span>
                     )}
