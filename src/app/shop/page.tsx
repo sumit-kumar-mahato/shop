@@ -5,6 +5,7 @@ import { Star, SlidersHorizontal, Search, RefreshCw, X } from "lucide-react";
 import { prisma } from "@/lib/db";
 import ShopFiltersClient from "@/components/ShopFiltersClient";
 import SortSelector from "@/components/SortSelector";
+import ProductCardClient from "@/components/ProductCardClient";
 
 // Helper to safely parse JSON
 function safeParse(jsonString: string, fallback: any = []) {
@@ -198,65 +199,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
           {/* Products Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => {
-              const productImages = safeParse(product.images);
-              const sizes = safeParse(product.sizes);
-              const colors = safeParse(product.colors);
-              return (
-                <div key={product.id} className="group flex flex-col space-y-3 bg-white dark:bg-zinc-900 border border-luxury-200/20 dark:border-zinc-800/40 p-3 rounded-sm shadow-sm transition-all hover:shadow-md relative">
-                  {/* Image wrapper */}
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-luxury-100 dark:bg-zinc-950">
-                    <Image
-                      src={productImages[0] || "/placeholder.jpg"}
-                      alt={product.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {product.compareAtPrice && (
-                      <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-950 text-[10px] font-bold px-2 py-0.5 uppercase rounded-sm">
-                        -{product.discountPercentage}% OFF
-                      </span>
-                    )}
-                    {product.stock <= 5 && product.stock > 0 && (
-                      <span className="absolute bottom-2 left-2 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 uppercase rounded-sm">
-                        Low Stock ({product.stock})
-                      </span>
-                    )}
-                    {product.stock === 0 && (
-                      <span className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-bold tracking-widest uppercase">
-                        Sold Out
-                      </span>
-                    )}
-                    <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
-                  </div>
-
-                  {/* Text details */}
-                  <div className="flex flex-col space-y-1 flex-grow">
-                    <div className="flex justify-between items-center text-[10px] text-luxury-500 font-bold uppercase">
-                      <span>{product.categoryName}</span>
-                      <div className="flex items-center text-amber-500">
-                        <Star size={10} fill="currentColor" className="mr-0.5" />
-                        <span>{product.rating}</span>
-                      </div>
-                    </div>
-                    <Link href={`/product/${product.id}`} className="font-semibold text-sm hover:text-luxury-gold transition-colors line-clamp-1">
-                      {product.title}
-                    </Link>
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-luxury-100/60 dark:border-zinc-800/40">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-bold text-luxury-900 dark:text-white">₹{product.price}</span>
-                        {product.compareAtPrice && (
-                          <span className="text-xs text-luxury-400 dark:text-zinc-500 line-through">₹{product.compareAtPrice}</span>
-                        )}
-                      </div>
-                      <span className="text-[9px] text-luxury-400 font-semibold uppercase">
-                        {sizes.length} Size{sizes.length > 1 ? "s" : ""}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {filteredProducts.map((product) => (
+              <ProductCardClient key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </div>

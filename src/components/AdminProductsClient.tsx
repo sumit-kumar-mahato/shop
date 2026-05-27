@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Plus, Edit3, Trash2, X, AlertCircle, Sparkles, Filter, Search, Star } from "lucide-react";
+import { Plus, Edit3, Trash2, X, AlertCircle, Sparkles, Filter, Search, Star, Download } from "lucide-react";
 
 interface Product {
   id: string;
@@ -47,6 +47,33 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
+  const [filterStock, setFilterStock] = useState<"all" | "instock" | "lowstock" | "outofstock">("all");
+
+  const handleExportCSV = () => {
+    const headers = ["Title", "SKU", "Category", "Gender", "Price", "Original Price", "Stock", "Fabric", "Fit"];
+    const rows = products.map((p) => [
+      `"${p.title.replace(/"/g, '""')}"`,
+      p.sku,
+      p.categoryName,
+      p.gender,
+      p.price,
+      p.compareAtPrice || "",
+      p.stock,
+      `"${p.fabric.replace(/"/g, '""')}"`,
+      `"${p.fit.replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `boutique_product_catalog_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Form Fields
   const [title, setTitle] = useState("");
@@ -236,7 +263,17 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
       p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.sku.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = filterCategory ? p.categoryName === filterCategory : true;
-    return matchesSearch && matchesCat;
+    
+    let matchesStock = true;
+    if (filterStock === "instock") {
+      matchesStock = p.stock > 5;
+    } else if (filterStock === "lowstock") {
+      matchesStock = p.stock > 0 && p.stock <= 5;
+    } else if (filterStock === "outofstock") {
+      matchesStock = p.stock === 0;
+    }
+
+    return matchesSearch && matchesCat && matchesStock;
   });
 
   return (
@@ -246,18 +283,27 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
           <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-zinc-900 dark:text-white">Products Catalog</h1>
           <p className="text-xs text-zinc-550 dark:text-zinc-400 font-light mt-0.5">Visually list, edit, or create retail items.</p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-950 font-bold text-xs tracking-wider py-3 px-5 rounded flex items-center gap-1.5 uppercase transition-all active:scale-95 flex-shrink-0"
-        >
-          <Plus size={16} /> Add New Apparel
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 font-bold text-xs tracking-wider py-3 px-4 rounded flex items-center gap-1.5 uppercase transition-all active:scale-95 flex-shrink-0"
+          >
+            <Download size={14} /> Export CSV
+          </button>
+          <button
+            onClick={openAddModal}
+            className="bg-luxury-gold hover:bg-luxury-gold/90 text-zinc-950 font-bold text-xs tracking-wider py-3 px-5 rounded flex items-center gap-1.5 uppercase transition-all active:scale-95 flex-shrink-0"
+          >
+            <Plus size={16} /> Add New Apparel
+          </button>
+        </div>
       </div>
 
       {/* Search and filter controls */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-grow">
-          <Search size={15} className="absolute left-3 top-3 text-zinc-500" />
+          <Search size={15} className="absolute left-3 top-3 text-zinc-550" />
           <input
             type="text"
             placeholder="Search by Title or SKU..."
@@ -278,6 +324,29 @@ export default function AdminProductsClient({ initialProducts, categories }: Adm
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Stock status pills */}
+      <div className="flex flex-wrap gap-1.5 text-[9px] font-bold uppercase tracking-wider border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+        {[
+          { label: "All Items", value: "all" },
+          { label: "In Stock (>5)", value: "instock" },
+          { label: "Low Stock (1-5)", value: "lowstock" },
+          { label: "Out of Stock (0)", value: "outofstock" },
+        ].map((pill) => (
+          <button
+            key={pill.value}
+            type="button"
+            onClick={() => setFilterStock(pill.value as any)}
+            className={`px-3 py-1.5 rounded transition-all ${
+              filterStock === pill.value
+                ? "bg-luxury-gold text-zinc-955"
+                : "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-550 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
+            }`}
+          >
+            {pill.label}
+          </button>
+        ))}
       </div>
 
       {/* Catalog Table */}

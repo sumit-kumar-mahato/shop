@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ListOrdered, Eye, Edit3, X, Printer, Search, CheckCircle } from "lucide-react";
+import { ListOrdered, Eye, Edit3, X, Printer, Search, CheckCircle, Download } from "lucide-react";
 
 interface Order {
   id: string;
@@ -42,6 +42,32 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
+  const handleExportCSV = () => {
+    const headers = ["Order Number", "Customer Name", "Customer Email", "Phone", "City", "Payment Method", "Charged Total", "Status", "Date"];
+    const rows = orders.map((o) => [
+      o.orderNumber,
+      `"${o.customerName.replace(/"/g, '""')}"`,
+      o.customerEmail,
+      o.customerPhone,
+      `"${o.city.replace(/"/g, '""')}"`,
+      o.paymentMethod,
+      o.finalTotal,
+      o.status,
+      new Date(o.createdAt).toISOString().slice(0,10)
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `boutique_orders_register_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
       const res = await fetch(`/api/orders/update?id=${id}`, {
@@ -74,11 +100,18 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
           <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-zinc-900 dark:text-white">Orders Manager</h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-light mt-0.5">Track logistics, modify status, and view client invoices.</p>
+          <p className="text-xs text-zinc-555 dark:text-zinc-400 font-light mt-0.5">Track logistics, modify status, and view client invoices.</p>
         </div>
+        <button
+          type="button"
+          onClick={handleExportCSV}
+          className="border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 font-bold text-xs tracking-wider py-3 px-4 rounded flex items-center gap-1.5 uppercase transition-all active:scale-95 flex-shrink-0"
+        >
+          <Download size={14} /> Export Register
+        </button>
       </div>
 
       {/* Filters row */}
@@ -104,6 +137,30 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
           <option value="Delivered">Delivered</option>
           <option value="Cancelled">Cancelled</option>
         </select>
+      </div>
+
+      {/* Status pills */}
+      <div className="flex flex-wrap gap-1.5 text-[9px] font-bold uppercase tracking-wider border-b border-zinc-100 dark:border-zinc-800/40 pb-3">
+        {[
+          { label: "All Orders", value: "" },
+          { label: "Processing", value: "Processing" },
+          { label: "Shipped", value: "Shipped" },
+          { label: "Delivered", value: "Delivered" },
+          { label: "Cancelled", value: "Cancelled" },
+        ].map((pill) => (
+          <button
+            key={pill.value}
+            type="button"
+            onClick={() => setFilterStatus(pill.value)}
+            className={`px-3 py-1.5 rounded transition-all ${
+              filterStatus === pill.value
+                ? "bg-luxury-gold text-zinc-955"
+                : "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-550 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
+            }`}
+          >
+            {pill.label}
+          </button>
+        ))}
       </div>
 
       {/* Orders Table */}

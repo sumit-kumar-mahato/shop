@@ -64,6 +64,9 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
       stock: product.stock,
     });
 
+    // Dispatch custom event to slide open Cart Drawer
+    window.dispatchEvent(new CustomEvent("open-cart-drawer"));
+
     // Trigger visual confetti feedback
     confetti({
       particleCount: 50,
@@ -85,6 +88,10 @@ export default function ProductCardClient({ product }: ProductCardClientProps) {
       categoryName: product.categoryName,
       stock: product.stock,
     });
+
+    if (!isLiked) {
+      window.dispatchEvent(new CustomEvent("open-wishlist-drawer"));
+    }
   };
 
   return (

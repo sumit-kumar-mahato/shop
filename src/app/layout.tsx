@@ -6,6 +6,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import BackToTop from "@/components/BackToTop";
 import { CartProvider } from "@/components/CartContext";
 import { WishlistProvider } from "@/components/WishlistContext";
 import { prisma } from "@/lib/db";
@@ -116,6 +117,7 @@ export default async function RootLayout({
               instagramUrl={settings.instagramUrl}
               facebookUrl={settings.facebookUrl}
             />
+            <BackToTop />
           </WishlistProvider>
         </CartProvider>
       </body>
