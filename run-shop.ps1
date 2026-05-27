@@ -1,10 +1,10 @@
-# PowerShell Runner Script for Avant-Garde Luxury Storefront & CMS
+# PowerShell Runner Script for Prabodh Kumar Mahato Luxury Storefront & CMS
 # Double-click or run this script to launch the application using Docker
 
 Clear-Host
 
 Write-Output "========================================================"
-Write-Output "       AVANT-GARDE LUXURY CLOTHING RETAIL SYSTEM        "
+Write-Output "   PRABODH KUMAR MAHATO LUXURY CLOTHING RETAIL SYSTEM   "
 Write-Output "        No-Code visual Storefront & Admin CMS           "
 Write-Output "========================================================"
 Write-Output ""
