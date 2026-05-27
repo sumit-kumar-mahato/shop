@@ -103,7 +103,7 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
           <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-zinc-900 dark:text-white">Orders Manager</h1>
-          <p className="text-xs text-zinc-555 dark:text-zinc-400 font-light mt-0.5">Track logistics, modify status, and view client invoices.</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-light mt-0.5">Track logistics, modify status, and view client invoices.</p>
         </div>
         <button
           type="button"
@@ -155,7 +155,7 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
             className={`px-3 py-1.5 rounded transition-all ${
               filterStatus === pill.value
                 ? "bg-luxury-gold text-zinc-955"
-                : "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-550 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
+                : "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
             }`}
           >
             {pill.label}
@@ -189,7 +189,7 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
                     <td className="py-3 px-4 font-semibold text-luxury-gold font-mono uppercase">{o.orderNumber}</td>
                     <td className="py-3 px-4">
                       <p className="font-semibold text-zinc-800 dark:text-zinc-200">{o.customerName}</p>
-                      <p className="text-[10px] text-zinc-500 dark:text-zinc-550">{o.customerEmail}</p>
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-500">{o.customerEmail}</p>
                     </td>
                     <td className="py-3 px-4 uppercase text-[10px]">{o.paymentMethod}</td>
                     <td className="py-3 px-4">
@@ -269,7 +269,7 @@ export default function AdminOrdersClient({ initialOrders }: AdminOrdersClientPr
 
               {/* Items Summary list */}
               <div>
-                <p className="text-[10px] text-zinc-500 dark:text-zinc-550 font-bold uppercase mb-2">Purchased Items</p>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-500 font-bold uppercase mb-2">Purchased Items</p>
                 <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/60 p-3 rounded space-y-2">
                   {safeParse(selectedOrder.items).map((item: any, i: number) => (
                     <div key={i} className="flex justify-between items-center">

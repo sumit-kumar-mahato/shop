@@ -495,7 +495,7 @@ const Navbar: React.FC<NavbarProps> = ({ logoText, contactEmail }) => {
               {cartItems.length === 0 ? (
                 <div className="text-center py-20 space-y-4">
                   <ShoppingBag size={40} className="mx-auto text-zinc-300 dark:text-zinc-700" />
-                  <p className="text-sm text-zinc-500 dark:text-zinc-550 font-light">Your shopping bag is completely empty.</p>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-500 font-light">Your shopping bag is completely empty.</p>
                   <Link
                     href="/shop"
                     onClick={() => setCartDrawerOpen(false)}
@@ -665,7 +665,7 @@ const Navbar: React.FC<NavbarProps> = ({ logoText, contactEmail }) => {
               {wishlistItems.length === 0 ? (
                 <div className="text-center py-20 space-y-4">
                   <Heart size={40} className="mx-auto text-zinc-300 dark:text-zinc-700" />
-                  <p className="text-sm text-zinc-500 dark:text-zinc-550 font-light">Your wishlist is currently empty.</p>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-500 font-light">Your wishlist is currently empty.</p>
                   <Link
                     href="/shop"
                     onClick={() => setWishlistDrawerOpen(false)}

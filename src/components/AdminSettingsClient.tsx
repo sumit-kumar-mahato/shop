@@ -61,7 +61,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSave} className="space-y-6 text-xs font-light text-zinc-555 dark:text-zinc-400">
+      <form onSubmit={handleSave} className="space-y-6 text-xs font-light text-zinc-500 dark:text-zinc-400">
         <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
           <div>
             <h1 className="serif-header text-2xl font-bold uppercase tracking-wide text-zinc-900 dark:text-white flex items-center gap-2">
@@ -92,7 +92,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     type="text"
                     value={settings.storeName}
                     onChange={(e) => handleFieldChange("storeName", e.target.value)}
-                    className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-bold"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-bold"
                     required
                   />
                 </div>
@@ -103,7 +103,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     type="text"
                     value={settings.logoText}
                     onChange={(e) => handleFieldChange("logoText", e.target.value)}
-                    className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-bold font-mono tracking-widest uppercase"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-bold font-mono tracking-widest uppercase"
                     required
                   />
                 </div>
@@ -122,7 +122,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                         type="text"
                         value={settings.primaryColor}
                         onChange={(e) => handleFieldChange("primaryColor", e.target.value)}
-                        className="flex-grow bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono font-bold text-center"
+                        className="flex-grow bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono font-bold text-center"
                         required
                       />
                     </div>
@@ -140,7 +140,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                         type="text"
                         value={settings.secondaryColor}
                         onChange={(e) => handleFieldChange("secondaryColor", e.target.value)}
-                        className="flex-grow bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono font-bold text-center"
+                        className="flex-grow bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono font-bold text-center"
                         required
                       />
                     </div>
@@ -148,7 +148,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                 </div>
 
                 <div className="pt-2 space-y-2 border-t border-zinc-200 dark:border-zinc-850">
-                  <label className="text-[9px] font-bold text-zinc-555 dark:text-zinc-500 uppercase tracking-widest">Preset Designer Themes</label>
+                  <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest">Preset Designer Themes</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { name: "Luxury Gold", primary: "#c5a880", secondary: "#111827" },
@@ -190,7 +190,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     type="email"
                     value={settings.contactEmail}
                     onChange={(e) => handleFieldChange("contactEmail", e.target.value)}
-                    className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
                     required
                   />
                 </div>
@@ -201,7 +201,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     type="text"
                     value={settings.contactPhone}
                     onChange={(e) => handleFieldChange("contactPhone", e.target.value)}
-                    className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                     required
                   />
                 </div>
@@ -212,7 +212,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     type="text"
                     value={settings.address}
                     onChange={(e) => handleFieldChange("address", e.target.value)}
-                    className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                     required
                   />
                 </div>
@@ -223,7 +223,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     type="text"
                     value={(settings as any).instagramUrl || ""}
                     onChange={(e) => handleFieldChange("instagramUrl", e.target.value)}
-                    className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
                   />
                 </div>
 
@@ -233,7 +233,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     type="text"
                     value={(settings as any).facebookUrl || ""}
                     onChange={(e) => handleFieldChange("facebookUrl", e.target.value)}
-                    className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
+                    className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
                   />
                 </div>
               </div>
@@ -250,7 +250,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   type="text"
                   value={settings.seoTitle}
                   onChange={(e) => handleFieldChange("seoTitle", e.target.value)}
-                  className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white"
                   required
                 />
               </div>
@@ -261,7 +261,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   value={settings.seoDescription}
                   onChange={(e) => handleFieldChange("seoDescription", e.target.value)}
                   rows={3}
-                  className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-light"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-light"
                   required
                 />
               </div>

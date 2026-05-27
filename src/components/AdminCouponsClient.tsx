@@ -110,7 +110,7 @@ export default function AdminCouponsClient({ initialCoupons }: AdminCouponsClien
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
               {coupons.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-zinc-550 dark:text-zinc-500 italic">No active coupons available.</td>
+                  <td colSpan={6} className="py-8 text-center text-zinc-500 dark:text-zinc-500 italic">No active coupons available.</td>
                 </tr>
               ) : (
                 coupons.map((c) => (
@@ -156,7 +156,7 @@ export default function AdminCouponsClient({ initialCoupons }: AdminCouponsClien
               <h3 className="serif-header text-lg uppercase tracking-wider text-zinc-900 dark:text-white font-bold flex items-center gap-2">
                 <Tag size={18} className="text-luxury-gold" /> Create Discount Voucher
               </h3>
-              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-550 dark:text-zinc-400">
+              <button onClick={() => setModalOpen(false)} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-500 dark:text-zinc-400">
                 <X size={18} />
               </button>
             </div>

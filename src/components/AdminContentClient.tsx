@@ -516,7 +516,7 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
                   value={(config as any).service4Desc || ""}
                   placeholder="Pure silks, linens & cottons"
                   onChange={(e) => handleConfigChange("service4Desc", e.target.value)}
-                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
             </div>
@@ -535,7 +535,7 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
                   value={(config as any).flashSaleBadge || ""}
                   placeholder="FLASH SALE RUNNING"
                   onChange={(e) => handleConfigChange("flashSaleBadge", e.target.value)}
-                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold uppercase focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold uppercase focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -545,7 +545,7 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
                   value={(config as any).flashSaleHours || ""}
                   placeholder="18"
                   onChange={(e) => handleConfigChange("flashSaleHours", e.target.value)}
-                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
@@ -555,7 +555,7 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
                   value={(config as any).flashSaleTitle || ""}
                   placeholder="Mid-Season Clearance"
                   onChange={(e) => handleConfigChange("flashSaleTitle", e.target.value)}
-                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
               <div className="flex flex-col space-y-1.5 sm:col-span-2">
@@ -565,7 +565,7 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
                   placeholder="Get premium Supima cotton tees, raw denim..."
                   onChange={(e) => handleConfigChange("flashSaleSubtitle", e.target.value)}
                   rows={2}
-                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
             </div>
