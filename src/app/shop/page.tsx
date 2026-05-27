@@ -7,6 +7,8 @@ import ShopFiltersClient from "@/components/ShopFiltersClient";
 import SortSelector from "@/components/SortSelector";
 import ProductCardClient from "@/components/ProductCardClient";
 
+export const dynamic = "force-dynamic";
+
 // Helper to safely parse JSON
 function safeParse(jsonString: string, fallback: any = []) {
   try {

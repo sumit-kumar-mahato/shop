@@ -4,6 +4,8 @@ import Image from "next/image";
 import { ArrowRight, Calendar, User, Clock } from "lucide-react";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 // Helper to safely parse JSON strings
 function safeParse(jsonString: string, fallback: any = []) {
   try {

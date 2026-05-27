@@ -6,6 +6,8 @@ import { Star, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 import ProductDetailClient from "@/components/ProductDetailClient";
 
+export const dynamic = "force-dynamic";
+
 // Helper to safely parse JSON strings
 function safeParse(jsonString: string, fallback: any = []) {
   try {
