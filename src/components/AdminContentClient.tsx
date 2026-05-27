@@ -55,6 +55,29 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
     setConfig((prev) => ({ ...prev, [key]: val }));
   };
 
+  const handleAddBanner = () => {
+    const newBanner = {
+      id: `slide_${Date.now()}`,
+      title: "NEW ARRIVALS",
+      subtitle: "EXQUISITE COUTURE",
+      description: "Discover our latest curated line of French linen shirts, silk sarees, and high-end apparel designed for the modern wardrobe.",
+      buttonText: "DISCOVER NOW",
+      link: "/shop",
+      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&auto=format&fit=crop&q=80",
+    };
+    setConfig((prev) => ({
+      ...prev,
+      banners: [...(prev.banners || []), newBanner],
+    }));
+  };
+
+  const handleDeleteBanner = (index: number) => {
+    setConfig((prev) => ({
+      ...prev,
+      banners: (prev.banners || []).filter((_, i) => i !== index),
+    }));
+  };
+
   // Section human-readable labels
   const sectionLabels: Record<string, string> = {
     "hero-slider": "Hero Image Carousel Banner",
@@ -172,14 +195,37 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
 
         {/* Banner Carousel Editor */}
         <div className="lg:col-span-2 space-y-6">
-          {config.banners.map((banner, index) => (
+          <div className="flex justify-between items-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-sm">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white">Carousel Slides ({config.banners?.length || 0})</h2>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-light mt-0.5">Manage your home page hero advertisement slider.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddBanner}
+              className="bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-955 font-bold text-[10px] tracking-widest py-2.5 px-4 rounded-sm flex items-center gap-1.5 uppercase transition-all"
+            >
+              <Plus size={12} /> Add New Slide
+            </button>
+          </div>
+
+          {(config.banners || []).map((banner, index) => (
             <div
               key={banner.id}
-              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-600 dark:text-zinc-400"
+              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-650 dark:text-zinc-400"
             >
-              <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2 flex justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2 flex justify-between items-center">
                 <span>Carousel Banner slide #{index + 1}</span>
-                <span className="text-[10px] text-luxury-gold uppercase font-mono">{banner.id}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] text-luxury-gold uppercase font-mono">{banner.id}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteBanner(index)}
+                    className="text-red-500 hover:text-red-700 dark:hover:text-red-400 font-bold uppercase text-[9px] tracking-wider border border-red-500/20 px-2 py-0.5 rounded hover:bg-red-500/5 transition-colors"
+                  >
+                    Delete Slide
+                  </button>
+                </div>
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -470,7 +516,56 @@ export default function AdminContentClient({ initialConfig }: AdminContentClient
                   value={(config as any).service4Desc || ""}
                   placeholder="Pure silks, linens & cottons"
                   onChange={(e) => handleConfigChange("service4Desc", e.target.value)}
-                  className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Flash Sale Editor */}
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-sm space-y-4 text-xs font-light text-zinc-650 dark:text-zinc-400">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-2">
+              Flash Sale Clearance Config
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Flash Sale Badge</label>
+                <input
+                  type="text"
+                  value={(config as any).flashSaleBadge || ""}
+                  placeholder="FLASH SALE RUNNING"
+                  onChange={(e) => handleConfigChange("flashSaleBadge", e.target.value)}
+                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold uppercase focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Timer Duration (Hours)</label>
+                <input
+                  type="number"
+                  value={(config as any).flashSaleHours || ""}
+                  placeholder="18"
+                  onChange={(e) => handleConfigChange("flashSaleHours", e.target.value)}
+                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5 sm:col-span-2">
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Flash Sale Title</label>
+                <input
+                  type="text"
+                  value={(config as any).flashSaleTitle || ""}
+                  placeholder="Mid-Season Clearance"
+                  onChange={(e) => handleConfigChange("flashSaleTitle", e.target.value)}
+                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5 sm:col-span-2">
+                <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Flash Sale Subtext / Description</label>
+                <textarea
+                  value={(config as any).flashSaleSubtitle || ""}
+                  placeholder="Get premium Supima cotton tees, raw denim..."
+                  onChange={(e) => handleConfigChange("flashSaleSubtitle", e.target.value)}
+                  rows={2}
+                  className="bg-zinc-50 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded text-zinc-900 dark:text-white focus:outline-none focus:border-luxury-gold focus:ring-1 focus:ring-luxury-gold"
                 />
               </div>
             </div>

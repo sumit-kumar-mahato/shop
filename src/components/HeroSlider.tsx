@@ -48,37 +48,40 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ banners }) => {
             index === current ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
         >
-          {/* Background Image */}
+          {/* Background Image with Ken Burns animation */}
           <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-linear scale-105"
+            className={`absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-in-out ${
+              index === current ? "animate-kenburns" : ""
+            }`}
             style={{
-              backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.6) 20%, rgba(0, 0, 0, 0.2)), url(${banner.image})`,
-              transform: index === current ? "scale(1)" : "scale(1.05)",
+              backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.65) 20%, rgba(0, 0, 0, 0.2)), url(${banner.image})`,
             }}
           />
 
           {/* Banner Content */}
           <div className="absolute inset-0 flex items-center">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
-              <div className="max-w-xl space-y-6">
-                <span className="inline-block text-xs font-bold tracking-widest text-luxury-gold uppercase border-b-2 border-luxury-gold pb-1 animate-fade-in">
-                  {banner.subtitle}
-                </span>
-                <h1 className="serif-header text-4xl sm:text-6xl font-normal leading-tight tracking-tight uppercase drop-shadow-md animate-fade-in-up">
-                  {banner.title}
-                </h1>
-                <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow">
-                  {banner.description}
-                </p>
-                <div className="pt-4">
-                  <Link
-                    href={banner.link}
-                    className="inline-block bg-white text-zinc-950 hover:bg-luxury-gold hover:text-zinc-950 text-xs font-bold tracking-widest px-8 py-4 rounded-sm transition-all duration-300 transform active:scale-95 shadow-md"
-                  >
-                    {banner.buttonText}
-                  </Link>
+              {index === current && (
+                <div className="max-w-xl space-y-6">
+                  <span className="inline-block text-xs font-bold tracking-widest text-luxury-gold uppercase border-b-2 border-luxury-gold pb-1 animate-fade-in-up" style={{ animationDelay: "150ms" }}>
+                    {banner.subtitle}
+                  </span>
+                  <h1 className="serif-header text-4xl sm:text-6xl font-normal leading-tight tracking-tight uppercase drop-shadow-md animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+                    {banner.title}
+                  </h1>
+                  <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow animate-fade-in-up" style={{ animationDelay: "450ms" }}>
+                    {banner.description}
+                  </p>
+                  <div className="pt-4 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
+                    <Link
+                      href={banner.link}
+                      className="inline-block bg-white text-zinc-950 hover:bg-luxury-gold hover:text-zinc-950 text-xs font-bold tracking-widest px-8 py-4 rounded-sm transition-all duration-300 transform active:scale-95 shadow-md hover:shadow-luxury-gold/20"
+                    >
+                      {banner.buttonText}
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

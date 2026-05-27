@@ -1,5 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -57,6 +59,8 @@ export default async function RootLayout({
     contactEmail: "contact@prabodhclothing.com",
     contactPhone: "+91 98765 43210",
     address: "Chowka, Jharkhand, Pincode-832404",
+    instagramUrl: "https://instagram.com",
+    facebookUrl: "https://facebook.com",
   };
 
   try {
@@ -109,6 +113,8 @@ export default async function RootLayout({
               contactEmail={settings.contactEmail}
               contactPhone={settings.contactPhone}
               address={settings.address}
+              instagramUrl={settings.instagramUrl}
+              facebookUrl={settings.facebookUrl}
             />
           </WishlistProvider>
         </CartProvider>

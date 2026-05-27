@@ -5,6 +5,9 @@ import { ArrowRight, ShoppingBag, Star, RefreshCw, Truck, CreditCard, ShieldChec
 import { prisma } from "@/lib/db";
 import HeroSlider from "@/components/HeroSlider";
 import CountdownTimer from "@/components/CountdownTimer";
+import ProductCardClient from "@/components/ProductCardClient";
+
+export const dynamic = "force-dynamic";
 
 // Helper to safely parse JSON strings
 function safeParse(jsonString: string, fallback: any = []) {
@@ -162,39 +165,9 @@ export default async function HomePage() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  {newArrivals.map((product) => {
-                    const productImages = safeParse(product.images);
-                    return (
-                      <div key={product.id} className="group relative flex flex-col space-y-3 bg-white dark:bg-zinc-900 border border-luxury-200/20 dark:border-zinc-800/40 p-3 rounded-sm shadow-sm transition-all hover:shadow-md">
-                        <div className="relative aspect-[3/4] w-full overflow-hidden bg-luxury-100 dark:bg-zinc-950">
-                          <Image
-                            src={productImages[0] || "/placeholder.jpg"}
-                            alt={product.title}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                          {product.compareAtPrice && (
-                            <span className="absolute top-2 left-2 bg-luxury-gold text-zinc-950 text-[10px] font-bold px-2 py-0.5 uppercase">
-                              -{product.discountPercentage}%
-                            </span>
-                          )}
-                          <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
-                        </div>
-                        <div className="flex flex-col space-y-1 flex-grow">
-                          <span className="text-[10px] tracking-widest text-luxury-500 font-bold uppercase">{product.categoryName}</span>
-                          <Link href={`/product/${product.id}`} className="font-semibold text-sm hover:text-luxury-gold transition-colors line-clamp-1">
-                            {product.title}
-                          </Link>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-bold text-luxury-900 dark:text-white">₹{product.price}</span>
-                            {product.compareAtPrice && (
-                              <span className="text-xs text-luxury-400 dark:text-zinc-500 line-through">₹{product.compareAtPrice}</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {newArrivals.map((product) => (
+                    <ProductCardClient key={product.id} product={product} />
+                  ))}
                 </div>
               </section>
             );
@@ -242,37 +215,9 @@ export default async function HomePage() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  {bestSellers.map((product) => {
-                    const productImages = safeParse(product.images);
-                    return (
-                      <div key={product.id} className="group relative flex flex-col space-y-3 bg-white dark:bg-zinc-900 border border-luxury-200/20 dark:border-zinc-800/40 p-3 rounded-sm shadow-sm transition-all hover:shadow-md">
-                        <div className="relative aspect-[3/4] w-full overflow-hidden bg-luxury-100 dark:bg-zinc-950">
-                          <Image
-                            src={productImages[0] || "/placeholder.jpg"}
-                            alt={product.title}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                          <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" />
-                        </div>
-                        <div className="flex flex-col space-y-1 flex-grow">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] tracking-widest text-luxury-500 font-bold uppercase">{product.categoryName}</span>
-                            <div className="flex items-center text-[11px] text-amber-500 font-bold">
-                              <Star size={11} fill="currentColor" className="mr-0.5" />
-                              <span>{product.rating}</span>
-                            </div>
-                          </div>
-                          <Link href={`/product/${product.id}`} className="font-semibold text-sm hover:text-luxury-gold transition-colors line-clamp-1">
-                            {product.title}
-                          </Link>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-bold text-luxury-900 dark:text-white">₹{product.price}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {bestSellers.map((product) => (
+                    <ProductCardClient key={product.id} product={product} />
+                  ))}
                 </div>
               </section>
             );
@@ -284,15 +229,15 @@ export default async function HomePage() {
                 <div className="bg-luxury-100 dark:bg-zinc-900 border border-luxury-200/50 dark:border-zinc-800 p-8 flex flex-col md:flex-row items-center justify-between gap-8 rounded-sm">
                   <div className="space-y-4">
                     <span className="inline-block bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 uppercase rounded tracking-wider animate-pulse">
-                      FLASH SALE RUNNING
+                      {settings.flashSaleBadge || "FLASH SALE RUNNING"}
                     </span>
                     <h3 className="serif-header text-2xl sm:text-3xl font-normal uppercase tracking-wide">
-                      Mid-Season Clearance
+                      {settings.flashSaleTitle || "Mid-Season Clearance"}
                     </h3>
                     <p className="text-xs sm:text-sm text-luxury-500 font-light max-w-md">
-                      Get premium Supima cotton tees, raw denim, and linen suits at limited-time discount rates. Free delivery applies.
+                      {settings.flashSaleSubtitle || "Get premium Supima cotton tees, raw denim, and linen suits at limited-time discount rates. Free delivery applies."}
                     </p>
-                    <CountdownTimer />
+                    <CountdownTimer hoursLimit={parseInt(settings.flashSaleHours) || 18} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 w-full md:w-auto">

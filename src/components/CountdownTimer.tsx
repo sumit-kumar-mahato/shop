@@ -2,12 +2,24 @@
 
 import React, { useState, useEffect } from "react";
 
-const CountdownTimer: React.FC = () => {
+interface CountdownTimerProps {
+  hoursLimit?: number;
+}
+
+const CountdownTimer: React.FC<CountdownTimerProps> = ({ hoursLimit = 18 }) => {
   const [timeLeft, setTimeLeft] = useState({
-    hours: 14,
-    minutes: 42,
-    seconds: 59,
+    hours: hoursLimit,
+    minutes: 0,
+    seconds: 0,
   });
+
+  useEffect(() => {
+    setTimeLeft({
+      hours: hoursLimit,
+      minutes: 0,
+      seconds: 0,
+    });
+  }, [hoursLimit]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,14 +31,14 @@ const CountdownTimer: React.FC = () => {
         } else if (prev.hours > 0) {
           return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
         } else {
-          // Reset to 18 hours when it reaches zero for continuous visual effect
-          return { hours: 18, minutes: 0, seconds: 0 };
+          // Reset to custom hoursLimit when it reaches zero
+          return { hours: hoursLimit, minutes: 0, seconds: 0 };
         }
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [hoursLimit]);
 
   const formatNumber = (num: number) => String(num).padStart(2, "0");
 

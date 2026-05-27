@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
   try {
@@ -15,6 +16,10 @@ export async function POST(req: Request) {
         value: JSON.stringify(body),
       },
     });
+
+    // Clear Next.js caching layers so changes propagate instantly on refresh
+    revalidatePath("/");
+    revalidatePath("/admin");
 
     return NextResponse.json({ success: true, config: updatedConfig });
   } catch (e: any) {

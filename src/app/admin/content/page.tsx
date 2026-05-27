@@ -26,6 +26,8 @@ export default async function AdminContentPage() {
     contactPhone: "+91 98765 43210",
     contactEmail: "contact@prabodhclothing.com",
     address: "Chowka, Jharkhand, Pincode-832404",
+    instagramUrl: "https://instagram.com",
+    facebookUrl: "https://facebook.com",
     seoTitle: "Prabodh Kumar Mahato | Luxury Clothing Storefront",
     seoDescription: "Premium clothing store featuring French linens, Banarasi sarees, and designer apparel.",
     banners: [],
@@ -37,6 +39,10 @@ export default async function AdminContentPage() {
       link: "/shop",
       image: "",
     },
+    flashSaleBadge: "FLASH SALE RUNNING",
+    flashSaleTitle: "Mid-Season Clearance",
+    flashSaleSubtitle: "Get premium Supima cotton tees, raw denim, and linen suits at limited-time discount rates. Free delivery applies.",
+    flashSaleHours: 18,
   };
 
   const finalConfig = cmsConfig || defaultCmsConfig;

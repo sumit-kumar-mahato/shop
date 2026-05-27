@@ -214,6 +214,26 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                 required
               />
             </div>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Instagram Profile Link</label>
+              <input
+                type="text"
+                value={(settings as any).instagramUrl || ""}
+                onChange={(e) => handleFieldChange("instagramUrl", e.target.value)}
+                className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
+              />
+            </div>
+
+            <div className="flex flex-col space-y-1.5">
+              <label className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 uppercase">Facebook Page Link</label>
+              <input
+                type="text"
+                value={(settings as any).facebookUrl || ""}
+                onChange={(e) => handleFieldChange("facebookUrl", e.target.value)}
+                className="bg-zinc-55 dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded focus:outline-none focus:border-luxury-gold text-zinc-900 dark:text-white font-mono"
+              />
+            </div>
           </div>
 
           {/* SEO Metadata Settings */}
