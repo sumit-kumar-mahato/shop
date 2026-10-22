@@ -1,32 +1,70 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, CreditCard, Gift, Leaf, Phone, Quote, RefreshCw, ShieldCheck, Star, Truck } from "lucide-react";
+import type { Prisma } from "@prisma/client";
+import { ArrowRight, ArrowUpRight, Quote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { getProductCards } from "@/lib/catalog";
+import { activeBanners } from "@/lib/homepage";
 import { GENDER_LABELS } from "@/lib/constants";
 import { formatINR } from "@/lib/money";
 import { cn, textBlocks } from "@/lib/utils";
-import type { HomepageSectionId } from "@/lib/settings-schema";
+import { isBuiltInSection, type BlockOf, type HomepageBlock, type HomepageSectionId } from "@/lib/settings-schema";
+import type { ProductCardData } from "@/lib/types";
 import HeroSlider from "@/components/store/HeroSlider";
 import ProductRail from "@/components/store/ProductRail";
 import CountdownTimer from "@/components/store/CountdownTimer";
 import NewsletterForm from "@/components/store/NewsletterForm";
+import {
+  BannerBlock,
+  CategoriesBlock,
+  FaqBlock,
+  GalleryBlock,
+  ImageTextBlock,
+  MarqueeBlock,
+  ProductsBlock,
+  SectionHead,
+  TextBlock,
+  VideoBlock,
+} from "@/components/store/home/HomeBlocks";
 import Reveal from "@/components/ui/Reveal";
 import Marquee from "@/components/ui/Marquee";
 import SmartImage from "@/components/ui/SmartImage";
 import ParallaxImage from "@/components/ui/ParallaxImage";
+import Icon from "@/components/ui/Icon";
 import { Stars } from "@/components/ui/Misc";
 
-const SERVICE_ICON = { truck: Truck, refresh: RefreshCw, card: CreditCard, shield: ShieldCheck, gift: Gift, star: Star, phone: Phone, leaf: Leaf };
+/** Products for a "Product collection" block. */
+function loadBlockProducts(block: BlockOf<"products">): Promise<ProductCardData[]> {
+  const take = block.limit;
+  const where: Record<BlockOf<"products">["source"], Prisma.ProductWhereInput> = {
+    new: { isNewArrival: true },
+    best: { isBestSeller: true },
+    featured: { isFeatured: true },
+    trending: { isTrending: true },
+    flash: { isFlashSale: true },
+    sale: { compareAtPrice: { not: null } },
+    newest: {},
+    category: { category: { slug: block.category } },
+    gender: { gender: block.gender },
+  };
+  const orderBy: Prisma.ProductOrderByWithRelationInput[] | undefined = block.source === "best" ? [{ salesCount: "desc" }] : undefined;
+  return getProductCards(where[block.source], { take, orderBy });
+}
 
 export default async function HomePage() {
   const home = await getSettings("homepage");
-  const enabled = home.sections.filter((s) => s.enabled);
+  const blocks = new Map(home.blocks.map((b) => [b.id, b]));
+  // Keep only sections that exist (a block may have been deleted while its entry remained).
+  const enabled = home.sections.filter((s) => s.enabled && (isBuiltInSection(s.id) || blocks.has(s.id)));
   const want = (id: HomepageSectionId) => enabled.some((s) => s.id === id);
-  const heroFirst = enabled[0]?.id === "hero";
+  const banners = activeBanners(home.banners);
+  const enabledBlocks = enabled.map((s) => blocks.get(s.id)).filter((b): b is HomepageBlock => Boolean(b));
+  const needCategories = want("categories") || enabledBlocks.some((b) => b.type === "categories");
+  const productBlocks = enabledBlocks.filter((b): b is BlockOf<"products"> => b.type === "products");
+  const heroFirst = enabled[0]?.id === "hero" && banners.length > 0;
 
-  const [categories, newArrivals, bestSellers, flashSale, featured, trending, testimonials] = await Promise.all([
-    want("categories") ? prisma.category.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }], take: 9 }) : [],
+  const [categories, newArrivals, bestSellers, flashSale, featured, trending, testimonials, blockProducts] = await Promise.all([
+    needCategories ? prisma.category.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] }) : [],
     want("new-arrivals") ? getProductCards({ isNewArrival: true }, { take: 10 }) : [],
     want("best-sellers") ? getProductCards({ isBestSeller: true }, { take: 10, orderBy: [{ salesCount: "desc" }] }) : [],
     want("flash-sale") ? getProductCards({ isFlashSale: true }, { take: 4 }) : [],
@@ -40,12 +78,48 @@ export default async function HomePage() {
           include: { user: { select: { name: true } }, product: { select: { title: true, slug: true } } },
         })
       : [],
+    Promise.all(productBlocks.map(async (b) => [b.id, await loadBlockProducts(b)] as const)).then((e) => new Map(e)),
   ]);
+  const text = home.sectionText;
 
-  const render = (id: HomepageSectionId, index: number) => {
-    switch (id) {
+  const renderBlock = (block: HomepageBlock) => {
+    switch (block.type) {
+      case "products":
+        return <ProductsBlock key={block.id} block={block} products={blockProducts.get(block.id) ?? []} />;
+      case "banner":
+        return <BannerBlock key={block.id} block={block} />;
+      case "image-text":
+        return <ImageTextBlock key={block.id} block={block} />;
+      case "categories":
+        return <CategoriesBlock key={block.id} block={block} categories={categories} />;
+      case "gallery":
+        return <GalleryBlock key={block.id} block={block} />;
+      case "marquee":
+        return <MarqueeBlock key={block.id} block={block} />;
+      case "video":
+        return <VideoBlock key={block.id} block={block} />;
+      case "text":
+        return <TextBlock key={block.id} block={block} />;
+      case "faq":
+        return <FaqBlock key={block.id} block={block} />;
+    }
+  };
+
+  const render = (id: string, index: number) => {
+    const block = blocks.get(id);
+    if (block) return renderBlock(block);
+    switch (id as HomepageSectionId) {
       case "hero":
-        return <HeroSlider key={id} banners={home.banners} fullScreen={index === 0} />;
+        return (
+          <HeroSlider
+            key={id}
+            banners={banners}
+            height={index === 0 ? home.hero.height : home.hero.height === "full" ? "large" : home.hero.height}
+            underHeader={index === 0}
+            intervalSeconds={home.hero.autoplaySeconds}
+            kenBurns={home.hero.kenBurns}
+          />
+        );
 
       case "services":
         if (!home.services.length) return null;
@@ -56,17 +130,14 @@ export default async function HomePage() {
             aria-label="Why shop with us"
           >
             <Marquee duration={36} className="mask-fade-x">
-              {[...home.services, ...home.services].map((s, i) => {
-                const Icon = SERVICE_ICON[s.icon];
-                return (
-                  <div key={i} className="flex items-center gap-3 px-10">
-                    <Icon className="text-brand" size={20} aria-hidden />
-                    <span className="whitespace-nowrap text-sm font-semibold uppercase tracking-[0.18em]">{s.title}</span>
-                    <span className="whitespace-nowrap text-sm text-luxury-500 dark:text-zinc-400">{s.description}</span>
-                    <span className="ml-10 text-brand" aria-hidden>✦</span>
-                  </div>
-                );
-              })}
+              {[...home.services, ...home.services].map((s, i) => (
+                <div key={i} className="flex items-center gap-3 px-10">
+                  <Icon name={s.icon} className="text-brand" size={20} />
+                  <span className="whitespace-nowrap text-sm font-semibold uppercase tracking-[0.18em]">{s.title}</span>
+                  <span className="whitespace-nowrap text-sm text-luxury-500 dark:text-zinc-400">{s.description}</span>
+                  <span className="ml-10 text-brand" aria-hidden>✦</span>
+                </div>
+              ))}
             </Marquee>
           </section>
         );
@@ -74,18 +145,10 @@ export default async function HomePage() {
       case "categories": {
         if (!categories.length) return null;
         const mosaic = categories.slice(0, 5);
-        const rest = categories.slice(5);
+        const rest = categories.slice(5, 12);
         return (
           <section key={id} className="container-page">
-            <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand">Curated for you</p>
-                <h2 className="mt-2 font-serif text-4xl sm:text-5xl">Shop by Category</h2>
-              </div>
-              <Link href="/shop" className="group flex items-center gap-1 text-sm font-semibold">
-                All products <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Reveal>
+            <SectionHead eyebrow={text.categories.eyebrow} title={text.categories.title} href="/shop" linkText="All products" />
             <div className="grid auto-rows-[220px] grid-cols-2 gap-3 sm:auto-rows-[260px] sm:gap-4 lg:grid-cols-4">
               {mosaic.map((c, i) => (
                 <Reveal key={c.id} delay={i * 90} className={cn(i === 0 && "col-span-2 row-span-2")}>
@@ -119,13 +182,13 @@ export default async function HomePage() {
       }
 
       case "new-arrivals":
-        return <Reveal key={id}><ProductRail eyebrow="Just dropped" title="New Arrivals" products={newArrivals} href="/shop?sort=newest" /></Reveal>;
+        return <Reveal key={id}><ProductRail eyebrow={text["new-arrivals"].eyebrow} title={text["new-arrivals"].title} products={newArrivals} href="/shop?sort=newest" /></Reveal>;
       case "best-sellers":
-        return <Reveal key={id}><ProductRail eyebrow="Customer favourites" title="Best Sellers" products={bestSellers} href="/shop?sort=popular" /></Reveal>;
+        return <Reveal key={id}><ProductRail eyebrow={text["best-sellers"].eyebrow} title={text["best-sellers"].title} products={bestSellers} href="/shop?sort=popular" /></Reveal>;
       case "featured":
-        return <Reveal key={id}><ProductRail eyebrow="Handpicked" title="Featured" products={featured} href="/shop" /></Reveal>;
+        return <Reveal key={id}><ProductRail eyebrow={text.featured.eyebrow} title={text.featured.title} products={featured} href="/shop" /></Reveal>;
       case "trending":
-        return <Reveal key={id}><ProductRail eyebrow="What's hot" title="Trending Now" products={trending} href="/shop?sort=popular" /></Reveal>;
+        return <Reveal key={id}><ProductRail eyebrow={text.trending.eyebrow} title={text.trending.title} products={trending} href="/shop?sort=popular" /></Reveal>;
 
       case "promo":
         if (!home.promo.title) return null;
@@ -139,7 +202,7 @@ export default async function HomePage() {
                 <h2 className="mt-4 font-serif text-5xl leading-[1.05] sm:text-7xl">{home.promo.title}</h2>
                 {home.promo.subtitle && <p className="mt-6 max-w-lg text-lg text-white/80">{home.promo.subtitle}</p>}
                 {home.promo.buttonText && home.promo.link && (
-                  <Link href={home.promo.link} className="group mt-10 inline-flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-zinc-950 transition-colors hover:bg-brand hover:text-brand-fg">
+                  <Link href={home.promo.link} className="group mt-10 inline-flex h-12 items-center gap-2 rounded-btn bg-white px-8 text-sm font-semibold text-zinc-950 transition-colors hover:bg-brand hover:text-brand-fg">
                     {home.promo.buttonText} <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                   </Link>
                 )}
@@ -163,9 +226,11 @@ export default async function HomePage() {
                   <h2 className="relative font-serif text-4xl sm:text-5xl">{home.flashSale.title}</h2>
                   <p className="relative text-white/70">{home.flashSale.subtitle}</p>
                   {home.flashSale.endsAt && <CountdownTimer endsAt={home.flashSale.endsAt} />}
-                  <Link href="/shop?sale=1" className="group relative mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold">
-                    Shop the sale <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                  </Link>
+                  {home.flashSale.buttonText && home.flashSale.link && (
+                    <Link href={home.flashSale.link} className="group relative mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold">
+                      {home.flashSale.buttonText} <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-px bg-white/10 sm:grid-cols-4">
                   {flashSale.map((p) => (
@@ -194,10 +259,12 @@ export default async function HomePage() {
                 <Reveal className="relative">
                   <div className="absolute -bottom-5 -right-5 hidden h-full w-full border border-brand/60 lg:block" aria-hidden />
                   <SmartImage src={home.brandStory.image} alt="" className="relative aspect-[4/5]" />
-                  <div className="absolute -left-4 bottom-10 hidden rounded-sm bg-white px-6 py-5 shadow-2xl dark:bg-zinc-900 sm:block">
-                    <p className="font-serif text-3xl">Handpicked</p>
-                    <p className="text-xs uppercase tracking-[0.2em] text-luxury-500">fabrics &amp; finishes</p>
-                  </div>
+                  {home.brandStory.badgeTitle && (
+                    <div className="absolute -left-4 bottom-10 hidden rounded-sm bg-white px-6 py-5 shadow-2xl dark:bg-zinc-900 sm:block">
+                      <p className="font-serif text-3xl">{home.brandStory.badgeTitle}</p>
+                      {home.brandStory.badgeText && <p className="text-xs uppercase tracking-[0.2em] text-luxury-500">{home.brandStory.badgeText}</p>}
+                    </div>
+                  )}
                 </Reveal>
               )}
               <Reveal delay={120} className="space-y-6">
@@ -206,9 +273,11 @@ export default async function HomePage() {
                 {textBlocks(home.brandStory.body).map((b, i) => (
                   <p key={i} className="text-lg leading-relaxed text-luxury-600 dark:text-zinc-400">{b.text}</p>
                 ))}
-                <Link href="/about" className="group inline-flex items-center gap-3 pt-2 text-sm font-semibold uppercase tracking-[0.15em]">
-                  <span className="h-px w-10 bg-current transition-all group-hover:w-16" /> Read our story
-                </Link>
+                {home.brandStory.buttonText && home.brandStory.link && (
+                  <Link href={home.brandStory.link} className="group inline-flex items-center gap-3 pt-2 text-sm font-semibold uppercase tracking-[0.15em]">
+                    <span className="h-px w-10 bg-current transition-all group-hover:w-16" /> {home.brandStory.buttonText}
+                  </Link>
+                )}
               </Reveal>
             </div>
           </section>
@@ -218,10 +287,9 @@ export default async function HomePage() {
         if (!testimonials.length) return null;
         return (
           <section key={id} className="overflow-hidden bg-luxury-100/70 py-20 dark:bg-zinc-900/50">
-            <Reveal className="container-page mb-12 text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand">Loved by our customers</p>
-              <h2 className="mt-2 font-serif text-4xl sm:text-5xl">What People Say</h2>
-            </Reveal>
+            <div className="container-page">
+              <SectionHead eyebrow={text.testimonials.eyebrow} title={text.testimonials.title} align="center" className="mb-12" />
+            </div>
             <Marquee duration={Math.max(30, testimonials.length * 9)} className="mask-fade-x">
               {(testimonials.length < 4 ? [...testimonials, ...testimonials] : testimonials).map((r, i) => (
                 <figure key={`${r.id}-${i}`} className="mx-3 flex w-[340px] flex-shrink-0 flex-col rounded-sm bg-white p-7 shadow-sm dark:bg-zinc-950 sm:w-[400px]">
@@ -247,7 +315,7 @@ export default async function HomePage() {
               <div className="absolute -left-24 top-0 h-72 w-72 rounded-full bg-brand/25 blur-3xl" aria-hidden />
               <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-brand/15 blur-3xl" aria-hidden />
               <div className="relative mx-auto max-w-xl space-y-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">The inner circle</p>
+                {home.newsletter.eyebrow && <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">{home.newsletter.eyebrow}</p>}
                 <h2 className="font-serif text-4xl sm:text-5xl">{home.newsletter.title}</h2>
                 <p className="text-white/70">{home.newsletter.description}</p>
                 <div className="mx-auto max-w-md pt-3">

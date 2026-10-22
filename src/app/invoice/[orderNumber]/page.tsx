@@ -15,7 +15,7 @@ export default async function InvoicePage({ params }: { params: { orderNumber: s
   if (!user) redirect(`/login?next=/invoice/${encodeURIComponent(params.orderNumber)}`);
   const order = await prisma.order.findUnique({ where: { orderNumber: params.orderNumber }, include: { items: true } });
   if (!order || (order.userId !== user.id && !isStaff(user))) notFound();
-  const store = await getSettings("store");
+  const [store, theme] = await Promise.all([getSettings("store"), getSettings("theme")]);
 
   return (
     <div className="min-h-screen bg-white py-10 text-zinc-900">
@@ -23,7 +23,7 @@ export default async function InvoicePage({ params }: { params: { orderNumber: s
         <div className="no-print mb-6 flex justify-end">
           <PrintButton />
         </div>
-        <header className="flex flex-wrap justify-between gap-6 border-b-2 pb-6" style={{ borderColor: store.primaryColor }}>
+        <header className="flex flex-wrap justify-between gap-6 border-b-2 pb-6" style={{ borderColor: theme.primaryColor }}>
           <div>
             <p className="font-display text-xl font-bold tracking-[0.15em]">{store.logoText}</p>
             <p className="mt-2 max-w-xs whitespace-pre-line text-sm text-zinc-600">{store.address}</p>

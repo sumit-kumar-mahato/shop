@@ -24,7 +24,7 @@ export default async function OrderDetailPage({ params, searchParams }: { params
   });
   if (!order || order.userId !== user.id) notFound();
 
-  const store = await getSettings("store");
+  const [store, theme] = await Promise.all([getSettings("store"), getSettings("theme")]);
   const deliveredAt = order.deliveredAt ?? order.updatedAt;
   const returnDeadline = new Date(deliveredAt.getTime() + store.orders.returnWindowDays * 86_400_000);
   const canReturn = order.status === "DELIVERED" && store.orders.returnWindowDays > 0 && Date.now() < returnDeadline.getTime();
@@ -92,7 +92,7 @@ export default async function OrderDetailPage({ params, searchParams }: { params
           returnDeadline={canReturn ? formatDate(returnDeadline) : null}
           canPay={canPay}
           storeName={store.storeName}
-          brandColor={store.primaryColor}
+          brandColor={theme.primaryColor}
         />
       </Card>
 

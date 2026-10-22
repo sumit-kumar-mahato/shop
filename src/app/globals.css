@@ -2,9 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Defaults; the live values come from Admin → Appearance (see app/layout.tsx). */
 :root {
   --brand-rgb: 197 168 128;
   --brand-fg-rgb: 17 17 17;
+  --font-sans: var(--f-inter);
+  --font-serif: var(--f-playfair);
+  --font-display: var(--f-outfit);
+  --radius-sm: 0.125rem;
+  --radius-btn: 9999px;
 }
 
 @layer base {
@@ -50,6 +56,29 @@
 .js .reveal.is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* "Animations" switched off in Admin → Appearance: show content immediately, keep hover feedback. */
+.no-motion .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+.no-motion .animate-kenburns,
+.no-motion .animate-rise,
+.no-motion .animate-page-in,
+.no-motion .animate-fade-in-up {
+  animation: none !important;
+}
+
+/* Outlined display text (homepage "Scrolling text" block) */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px currentColor;
+  -webkit-text-stroke-color: rgb(31 28 23 / 0.85);
+}
+.dark .text-outline {
+  -webkit-text-stroke-color: rgb(255 255 255 / 0.8);
 }
 
 /* Loading shimmer for images and skeletons */

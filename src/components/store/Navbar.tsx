@@ -11,18 +11,12 @@ import { useSession } from "@/components/providers/SessionProvider";
 import SmartImage from "@/components/ui/SmartImage";
 import { api } from "@/lib/fetcher";
 import { cn } from "@/lib/utils";
+import type { NavLink } from "@/lib/settings-schema";
+import Logo, { type LogoConfig } from "./Logo";
 import SearchOverlay from "./SearchOverlay";
 import ThemeToggle from "./ThemeToggle";
 
 type NavCategory = { name: string; slug: string; gender: Gender | null; image: string | null };
-
-const MAIN_LINKS = [
-  { label: "Men", href: "/shop?gender=men" },
-  { label: "Women", href: "/shop?gender=women" },
-  { label: "Kids", href: "/shop?gender=kids" },
-  { label: "Offers", href: "/offers" },
-  { label: "Journal", href: "/blog" },
-];
 
 const GROUPS: Array<{ title: string; match: (g: Gender | null) => boolean }> = [
   { title: "Women", match: (g) => g === "WOMEN" },
@@ -34,12 +28,18 @@ const GROUPS: Array<{ title: string; match: (g: Gender | null) => boolean }> = [
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export default function Navbar({
-  logoText,
+  logo,
+  links,
+  megaMenu,
+  allowThemeToggle,
   announcement,
   categories,
   overlayOnHome,
 }: {
-  logoText: string;
+  logo: LogoConfig;
+  links: NavLink[];
+  megaMenu: boolean;
+  allowThemeToggle: boolean;
   announcement: { text: string; link: string } | null;
   categories: NavCategory[];
   overlayOnHome: boolean;
@@ -132,6 +132,7 @@ export default function Navbar({
     "relative rounded-full p-2 transition-colors",
     transparent ? "text-white hover:bg-white/15" : "text-luxury-800 hover:bg-luxury-100 dark:text-zinc-200 dark:hover:bg-zinc-800",
   );
+  const highlightCls = transparent ? "text-white" : "!text-brand";
   const linkCls = cn(
     "relative py-2 text-[13px] font-medium uppercase tracking-[0.14em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100",
     transparent ? "text-white/90 after:bg-white hover:text-white" : "text-luxury-700 after:bg-luxury-900 hover:text-luxury-900 dark:text-zinc-300 dark:after:bg-white dark:hover:text-white",
@@ -171,11 +172,17 @@ export default function Navbar({
                 <Menu size={22} />
               </button>
               <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
-                <button className={cn(linkCls, "flex items-center gap-1")} onMouseEnter={() => setShopOpen(true)} onClick={() => setShopOpen((o) => !o)} aria-expanded={shopOpen}>
-                  Shop <ChevronDown size={14} className={cn("transition-transform", shopOpen && "rotate-180")} />
-                </button>
-                {MAIN_LINKS.slice(0, 3).map((l) => (
-                  <Link key={l.href} href={l.href} className={linkCls} onMouseEnter={() => setShopOpen(false)}>
+                {megaMenu ? (
+                  <button className={cn(linkCls, "flex items-center gap-1")} onMouseEnter={() => setShopOpen(true)} onClick={() => setShopOpen((o) => !o)} aria-expanded={shopOpen}>
+                    Shop <ChevronDown size={14} className={cn("transition-transform", shopOpen && "rotate-180")} />
+                  </button>
+                ) : (
+                  <Link href="/shop" className={linkCls}>
+                    Shop
+                  </Link>
+                )}
+                {links.slice(0, 3).map((l) => (
+                  <Link key={l.label + l.href} href={l.href} className={cn(linkCls, l.highlight && highlightCls)} onMouseEnter={() => setShopOpen(false)}>
                     {l.label}
                   </Link>
                 ))}
@@ -189,13 +196,13 @@ export default function Navbar({
                 transparent ? "text-white" : "text-luxury-900 dark:text-white",
               )}
             >
-              {logoText}
+              <Logo logo={logo} onDark={transparent} className="mx-auto" />
             </Link>
 
             <div className="flex items-center justify-end gap-0.5 sm:gap-1 lg:gap-6">
               <nav className="hidden items-center gap-7 xl:flex" aria-label="More">
-                {MAIN_LINKS.slice(3).map((l) => (
-                  <Link key={l.href} href={l.href} className={linkCls}>
+                {links.slice(3).map((l) => (
+                  <Link key={l.label + l.href} href={l.href} className={cn(linkCls, l.highlight && highlightCls)}>
                     {l.label}
                   </Link>
                 ))}
@@ -204,7 +211,7 @@ export default function Navbar({
                 <button className={iconBtn} onClick={() => setSearchOpen(true)} aria-label="Search (press /)">
                   <Search size={20} />
                 </button>
-                <ThemeToggle className={cn(iconBtn, "hidden sm:inline-flex")} />
+                {allowThemeToggle && <ThemeToggle className={cn(iconBtn, "hidden sm:inline-flex")} />}
                 <Link href="/account/wishlist" className={cn(iconBtn, "hidden sm:inline-flex")} aria-label="Wishlist">
                   <Heart size={20} />
                   {wishlist.ids.size > 0 && (
@@ -318,17 +325,17 @@ export default function Navbar({
           <div className="absolute inset-0 animate-fade-in bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div className="absolute inset-y-0 left-0 flex w-[88%] max-w-sm animate-slide-in-left flex-col bg-white shadow-2xl dark:bg-zinc-950">
             <div className="flex items-center justify-between border-b border-luxury-100 px-5 py-4 dark:border-zinc-800">
-              <span className="truncate font-display text-sm font-bold tracking-[0.18em]">{logoText}</span>
+              <Logo logo={{ ...logo, height: Math.min(logo.height, 32) }} textClassName="truncate text-sm tracking-[0.18em]" />
               <button onClick={() => setMobileOpen(false)} className="rounded-full p-2 hover:bg-luxury-100 dark:hover:bg-zinc-800" aria-label="Close menu">
                 <X size={20} />
               </button>
             </div>
             <nav className="flex-1 overflow-y-auto px-5 py-4" aria-label="Mobile">
-              {[{ label: "Shop all", href: "/shop" }, ...MAIN_LINKS].map((l, i) => (
+              {[{ label: "Shop all", href: "/shop", highlight: false }, ...links].map((l, i) => (
                 <Link
-                  key={l.href}
+                  key={l.label + l.href}
                   href={l.href}
-                  className="flex animate-fade-in-up items-center justify-between border-b border-luxury-100 py-4 font-serif text-2xl dark:border-zinc-800"
+                  className={cn("flex animate-fade-in-up items-center justify-between border-b border-luxury-100 py-4 font-serif text-2xl dark:border-zinc-800", l.highlight && "text-brand")}
                   style={{ animationDelay: `${i * 40}ms` }}
                 >
                   {l.label} <ArrowRight size={18} className="text-luxury-400" />
@@ -359,9 +366,11 @@ export default function Navbar({
                   <Link href="/register" className="flex h-11 items-center justify-center rounded-sm border border-luxury-300 text-sm font-semibold dark:border-zinc-700">Register</Link>
                 </div>
               )}
-              <div className="flex items-center justify-between pt-2 text-sm text-luxury-600 dark:text-zinc-400">
-                Theme <ThemeToggle className="rounded-full p-2 hover:bg-luxury-100 dark:hover:bg-zinc-800" />
-              </div>
+              {allowThemeToggle && (
+                <div className="flex items-center justify-between pt-2 text-sm text-luxury-600 dark:text-zinc-400">
+                  Theme <ThemeToggle className="rounded-full p-2 hover:bg-luxury-100 dark:hover:bg-zinc-800" />
+                </div>
+              )}
             </div>
           </div>
         </div>

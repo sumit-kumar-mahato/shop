@@ -7,7 +7,7 @@
  */
 import { PrismaClient, type Gender, type Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { defaultHomepageSettings, defaultPagesSettings, defaultStoreSettings } from "../src/lib/settings-schema";
+import { defaultHomepageSettings, defaultPagesSettings, defaultStoreSettings, defaultThemeSettings } from "../src/lib/settings-schema";
 
 // Load .env for local runs; hosted platforms provide real environment variables instead.
 try {
@@ -53,6 +53,18 @@ async function seedSettings() {
     if (!exists) {
       await prisma.setting.create({ data: { key, value: value as unknown as Prisma.InputJsonValue } });
       console.log(`✓ Default "${key}" settings created.`);
+    }
+  }
+
+  // The brand colour moved from store settings to Appearance (theme) settings — carry it over once.
+  const theme = await prisma.setting.findUnique({ where: { key: "theme" } });
+  if (!theme) {
+    const store = await prisma.setting.findUnique({ where: { key: "store" } });
+    const legacy = (store?.value as { primaryColor?: unknown } | null)?.primaryColor;
+    if (typeof legacy === "string" && /^#[0-9a-fA-F]{6}$/.test(legacy) && legacy !== defaultThemeSettings.primaryColor) {
+      const value = { ...defaultThemeSettings, primaryColor: legacy };
+      await prisma.setting.create({ data: { key: "theme", value: value as unknown as Prisma.InputJsonValue } });
+      console.log(`✓ Brand colour ${legacy} moved to Appearance settings.`);
     }
   }
 }

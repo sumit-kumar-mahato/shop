@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 /** Background image that drifts slower than the page scroll for a sense of depth. */
-export default function ParallaxImage({ src, className, strength = 0.18 }: { src: string; className?: string; strength?: number }) {
+export default function ParallaxImage({ src, mobileSrc, className, strength = 0.18 }: { src: string; mobileSrc?: string; className?: string; strength?: number }) {
   const wrap = useRef<HTMLDivElement>(null);
   const img = useRef<HTMLImageElement>(null);
 
@@ -34,7 +34,10 @@ export default function ParallaxImage({ src, className, strength = 0.18 }: { src
 
   return (
     <div ref={wrap} className={cn("absolute inset-0 overflow-hidden", className)} aria-hidden>
-      <img ref={img} src={src} alt="" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover will-change-transform" />
+      <picture>
+        {mobileSrc && <source media="(max-width: 767px)" srcSet={mobileSrc} />}
+        <img ref={img} src={src} alt="" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover will-change-transform" />
+      </picture>
     </div>
   );
 }

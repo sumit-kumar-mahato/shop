@@ -13,8 +13,11 @@ export function slugify(input: string): string {
     .slice(0, 80);
 }
 
+// Dates are always shown in Indian time, whatever time zone the server runs in.
+const TIME_ZONE = "Asia/Kolkata";
+
 export function formatDate(date: Date | string, opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" }) {
-  return new Date(date).toLocaleDateString("en-IN", opts);
+  return new Date(date).toLocaleDateString("en-IN", { timeZone: TIME_ZONE, ...opts });
 }
 
 export function formatDateTime(date: Date | string) {
@@ -24,6 +27,7 @@ export function formatDateTime(date: Date | string) {
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZone: TIME_ZONE,
   });
 }
 

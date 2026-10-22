@@ -4,11 +4,9 @@ import { prisma } from "@/lib/db";
 import { buildOrderWhere } from "@/lib/admin-queries";
 import { expireStalePendingOrders } from "@/lib/orders";
 import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from "@/lib/constants";
-import { formatINR } from "@/lib/money";
-import { formatDateTime } from "@/lib/utils";
-import { AdminPagination, PageHeader, Panel, Table, Td, Th, withParams } from "@/components/admin/ui";
-import { OrderStatusBadge, PaymentStatusBadge } from "@/components/store/OrderStatusBadge";
-import { cn } from "@/lib/utils";
+import { formatDateTime, cn } from "@/lib/utils";
+import { AdminPagination, PageHeader, Panel, withParams } from "@/components/admin/ui";
+import OrderTable from "@/components/admin/OrderTable";
 
 export const metadata = { title: "Orders" };
 const PER_PAGE = 25;
@@ -30,7 +28,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: SP }
   await expireStalePendingOrders();
   const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
   const where = buildOrderWhere(searchParams);
-  const [total, orders] = await Promise.all([
+  const [total, orders, counts] = await Promise.all([
     prisma.order.count({ where }),
     prisma.order.findMany({
       where,
@@ -39,7 +37,9 @@ export default async function AdminOrders({ searchParams }: { searchParams: SP }
       take: PER_PAGE,
       include: { _count: { select: { items: true } } },
     }),
+    prisma.order.groupBy({ by: ["status"], where: buildOrderWhere({ q: searchParams.q, payment: searchParams.payment }), _count: { _all: true } }),
   ]);
+  const countOf = (status?: string) => (status ? counts.find((c) => c.status === status)?._count._all ?? 0 : counts.reduce((n, c) => n + c._count._all, 0));
   const exportHref = withParams("/api/admin/orders/export", searchParams, { page: undefined });
 
   return (
@@ -60,9 +60,10 @@ export default async function AdminOrders({ searchParams }: { searchParams: SP }
             <Link
               key={t.label}
               href={withParams("/admin/orders", { q: searchParams.q }, { status: t.status })}
-              className={cn("flex-shrink-0 rounded-full px-3 py-1.5 text-sm", active ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900" : "text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800")}
+              className={cn("flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm", active ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900" : "text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800")}
             >
               {t.label}
+              <span className={cn("rounded-full px-1.5 text-[11px] tabular-nums", active ? "bg-white/20 dark:bg-zinc-900/10" : "bg-zinc-200 dark:bg-zinc-800")}>{countOf(t.status)}</span>
             </Link>
           );
         })}
@@ -83,38 +84,20 @@ export default async function AdminOrders({ searchParams }: { searchParams: SP }
         {orders.length === 0 ? (
           <p className="p-8 text-center text-sm text-zinc-500">No orders match.</p>
         ) : (
-          <Table>
-            <thead>
-              <tr>
-                <Th>Order</Th>
-                <Th>Date</Th>
-                <Th>Customer</Th>
-                <Th>Payment</Th>
-                <Th>Status</Th>
-                <Th className="text-right">Items</Th>
-                <Th className="text-right">Total</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((o) => (
-                <tr key={o.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                  <Td><Link href={`/admin/orders/${o.id}`} className="font-medium hover:underline">{o.orderNumber}</Link></Td>
-                  <Td className="whitespace-nowrap text-zinc-500">{formatDateTime(o.createdAt)}</Td>
-                  <Td>
-                    <p>{o.shippingName}</p>
-                    <p className="text-xs text-zinc-500">{o.shippingCity}, {o.shippingState}</p>
-                  </Td>
-                  <Td>
-                    <PaymentStatusBadge status={o.paymentStatus} />
-                    <p className="mt-1 text-xs text-zinc-500">{o.paymentMethod === "COD" ? "COD" : PAYMENT_METHOD_LABELS[o.paymentMethod].split(" ")[0]}</p>
-                  </Td>
-                  <Td><OrderStatusBadge status={o.status} /></Td>
-                  <Td className="text-right tabular-nums">{o._count.items}</Td>
-                  <Td className="text-right font-medium tabular-nums">{formatINR(o.total)}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <OrderTable
+            rows={orders.map((o) => ({
+              id: o.id,
+              orderNumber: o.orderNumber,
+              date: formatDateTime(o.createdAt),
+              name: o.shippingName,
+              place: `${o.shippingCity}, ${o.shippingState}`,
+              paymentStatus: o.paymentStatus,
+              method: o.paymentMethod === "COD" ? "COD" : PAYMENT_METHOD_LABELS[o.paymentMethod].split(" ")[0],
+              status: o.status,
+              items: o._count.items,
+              total: o.total,
+            }))}
+          />
         )}
         <AdminPagination page={page} pageCount={Math.ceil(total / PER_PAGE)} baseHref={(p) => withParams("/admin/orders", searchParams, { page: p })} />
       </Panel>

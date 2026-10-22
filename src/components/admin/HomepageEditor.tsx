@@ -1,178 +1,285 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Eye, EyeOff, Plus, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Field, FormError, Input, Select, Textarea } from "@/components/ui/Form";
-import { Panel } from "@/components/admin/ui";
-import { SingleImageField } from "@/components/admin/ImageUploader";
-import SettingsSaveBar from "@/components/admin/SettingsSaveBar";
+import { useEffect, useRef, useState } from "react";
+import {
+  AlignLeft,
+  BadgeCheck,
+  BookOpen,
+  Copy,
+  Eye,
+  EyeOff,
+  Film,
+  GalleryHorizontalEnd,
+  GripVertical,
+  HelpCircle,
+  Image as ImageIcon,
+  LayoutGrid,
+  Mail,
+  Megaphone,
+  MessageSquareQuote,
+  MoveHorizontal,
+  PanelsTopLeft,
+  Plus,
+  ShoppingBag,
+  Sparkles,
+  Timer,
+  Trash2,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react";
+import EditorShell, { type PreviewPath } from "@/components/admin/EditorShell";
 import { useSettingsForm } from "@/components/admin/useSettingsForm";
-import { HOMEPAGE_SECTIONS, SERVICE_ICONS, type Banner, type HomepageSettings } from "@/lib/settings-schema";
+import { IconBtn } from "@/components/admin/fields";
+import { BlockEditor, blockSummary, type EditorContext } from "@/components/admin/homepage/BlockEditors";
+import { SectionEditor } from "@/components/admin/homepage/SectionEditors";
+import {
+  BLOCK_TYPES,
+  HOMEPAGE_SECTIONS,
+  isBuiltInSection,
+  newBlock,
+  type BlockType,
+  type HomepageBlock,
+  type HomepageSectionId,
+  type HomepageSettings,
+} from "@/lib/settings-schema";
 import { cn } from "@/lib/utils";
 
-const toLocalInput = (iso: string) => (iso ? new Date(new Date(iso).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "");
+const SECTION_ICONS: Record<HomepageSectionId, LucideIcon> = {
+  hero: PanelsTopLeft,
+  services: BadgeCheck,
+  categories: LayoutGrid,
+  "new-arrivals": Sparkles,
+  promo: Megaphone,
+  "best-sellers": TrendingUp,
+  "flash-sale": Timer,
+  featured: ShoppingBag,
+  trending: TrendingUp,
+  "brand-story": BookOpen,
+  testimonials: MessageSquareQuote,
+  newsletter: Mail,
+};
+const BLOCK_ICONS: Record<BlockType, LucideIcon> = {
+  products: ShoppingBag,
+  banner: ImageIcon,
+  "image-text": BookOpen,
+  categories: LayoutGrid,
+  gallery: GalleryHorizontalEnd,
+  marquee: MoveHorizontal,
+  video: Film,
+  text: AlignLeft,
+  faq: HelpCircle,
+};
 
-export default function HomepageEditor({ initial }: { initial: HomepageSettings }) {
-  const { value: v, setValue: setV, dirty, saving, error, save, reset } = useSettingsForm("homepage", initial);
+export default function HomepageEditor({ initial, ctx, previewPaths }: { initial: HomepageSettings; ctx: EditorContext; previewPaths: PreviewPath[] }) {
+  const form = useSettingsForm("homepage", initial);
+  const v = form.value;
+  const set = form.setValue;
+  const [selected, setSelected] = useState<string>(v.sections[0]?.id ?? "hero");
+  const [adding, setAdding] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
 
-  const moveSection = (i: number, dir: -1 | 1) => {
-    const sections = [...v.sections];
-    [sections[i], sections[i + dir]] = [sections[i + dir], sections[i]];
-    setV({ ...v, sections });
+  const blocks = new Map(v.blocks.map((b) => [b.id, b]));
+  const sections = v.sections.filter((s) => isBuiltInSection(s.id) || blocks.has(s.id));
+  const missingBuiltIns = (Object.keys(HOMEPAGE_SECTIONS) as HomepageSectionId[]).filter((id) => !v.sections.some((s) => s.id === id));
+  const current = sections.find((s) => s.id === selected) ?? sections[0];
+
+  useEffect(() => {
+    if (!adding) return;
+    const close = () => setAdding(false);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, [adding]);
+
+  const select = (id: string) => {
+    setSelected(id);
+    // On narrow screens the editor sits below the list — bring it into view.
+    if (window.innerWidth < 1024) setTimeout(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
-  const setBanner = (i: number, patch: Partial<Banner>) => setV({ ...v, banners: v.banners.map((b, j) => (j === i ? { ...b, ...patch } : b)) });
-  const moveBanner = (i: number, dir: -1 | 1) => {
-    const banners = [...v.banners];
-    [banners[i], banners[i + dir]] = [banners[i + dir], banners[i]];
-    setV({ ...v, banners });
+
+  const label = (id: string) => {
+    if (isBuiltInSection(id)) return { name: HOMEPAGE_SECTIONS[id], detail: "", Icon: SECTION_ICONS[id] };
+    const b = blocks.get(id)!;
+    return { name: BLOCK_TYPES[b.type].label, detail: blockSummary(b), Icon: BLOCK_ICONS[b.type] };
   };
+
+  const toggle = (id: string) => set({ ...v, sections: v.sections.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)) });
+
+  const reorder = (from: number, to: number) => {
+    if (from === to) return;
+    const list = [...sections];
+    const [moved] = list.splice(from, 1);
+    list.splice(to, 0, moved);
+    set({ ...v, sections: list });
+  };
+
+  const addBlock = (type: BlockType) => {
+    const block = newBlock(type);
+    const at = Math.max(0, sections.findIndex((s) => s.id === current?.id)) + 1;
+    const list = [...sections];
+    list.splice(at, 0, { id: block.id, enabled: true });
+    set({ ...v, blocks: [...v.blocks, block], sections: list });
+    select(block.id);
+  };
+
+  const addBuiltIn = (id: HomepageSectionId) => {
+    set({ ...v, sections: [...sections, { id, enabled: true }] });
+    select(id);
+  };
+
+  const remove = (id: string) => {
+    const i = sections.findIndex((s) => s.id === id);
+    set({ ...v, sections: sections.filter((s) => s.id !== id), blocks: v.blocks.filter((b) => b.id !== id) });
+    setSelected(sections[i + 1]?.id ?? sections[i - 1]?.id ?? "");
+  };
+
+  const duplicate = (id: string) => {
+    const b = blocks.get(id);
+    if (!b) return;
+    const copy = { ...structuredClone(b), id: newBlock(b.type).id } as HomepageBlock;
+    const i = sections.findIndex((s) => s.id === id);
+    const list = [...sections];
+    list.splice(i + 1, 0, { id: copy.id, enabled: true });
+    set({ ...v, blocks: [...v.blocks, copy], sections: list });
+    select(copy.id);
+  };
+
+  const updateBlock = (b: HomepageBlock) => set({ ...v, blocks: v.blocks.map((x) => (x.id === b.id ? b : x)) });
+
+  const cur = current ? label(current.id) : null;
+  const curBlock = current ? blocks.get(current.id) : undefined;
 
   return (
-    <div className="space-y-6">
-      <FormError message={error} />
-      <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
-        <Panel title="Sections" description="Show, hide and reorder homepage sections" className="h-fit xl:sticky xl:top-20">
-          <ul className="space-y-1.5">
-            {v.sections.map((s, i) => (
-              <li key={s.id} className={cn("flex items-center gap-2 rounded-md border px-3 py-2 text-sm", s.enabled ? "border-zinc-200 dark:border-zinc-700" : "border-dashed border-zinc-200 text-zinc-400 dark:border-zinc-800")}>
-                <span className="flex-1">{HOMEPAGE_SECTIONS[s.id]}</span>
-                <button
-                  onClick={() => setV({ ...v, sections: v.sections.map((x, j) => (j === i ? { ...x, enabled: !x.enabled } : x)) })}
-                  className="rounded p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  aria-label={s.enabled ? `Hide ${HOMEPAGE_SECTIONS[s.id]}` : `Show ${HOMEPAGE_SECTIONS[s.id]}`}
-                  title={s.enabled ? "Visible — click to hide" : "Hidden — click to show"}
-                >
-                  {s.enabled ? <Eye size={15} /> : <EyeOff size={15} />}
-                </button>
-                <button onClick={() => moveSection(i, -1)} disabled={i === 0} className="rounded p-1 hover:bg-zinc-100 disabled:opacity-30 dark:hover:bg-zinc-800" aria-label="Move up"><ArrowUp size={15} /></button>
-                <button onClick={() => moveSection(i, 1)} disabled={i === v.sections.length - 1} className="rounded p-1 hover:bg-zinc-100 disabled:opacity-30 dark:hover:bg-zinc-800" aria-label="Move down"><ArrowDown size={15} /></button>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs text-zinc-500">Product sections (New arrivals, Best sellers…) show products you tick under “Homepage placement” when editing a product.</p>
-        </Panel>
-
-        <div className="space-y-6">
-          <Panel
-            title="Hero banners"
-            description="Large slides at the top of the homepage"
-            actions={
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={v.banners.length >= 8}
-                onClick={() =>
-                  setV({
-                    ...v,
-                    banners: [...v.banners, { id: `banner-${Date.now()}`, eyebrow: "", title: "New banner", description: "", buttonText: "Shop now", link: "/shop", image: "", align: "left" }],
-                  })
-                }
+    <EditorShell {...form} onSave={() => void form.save()} onReset={form.reset} previewPaths={previewPaths}>
+      <div className={cn("grid gap-5", form.preview.on ? "2xl:grid-cols-[260px_minmax(0,1fr)]" : "lg:grid-cols-[300px_minmax(0,1fr)]")}>
+        {/* Sections list */}
+        <aside className={cn("h-fit rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900", form.preview.on ? "2xl:sticky 2xl:top-20" : "lg:sticky lg:top-20")}>
+          <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+            <div>
+              <p className="font-semibold">Sections</p>
+              <p className="text-xs text-zinc-500">Drag to reorder · {sections.filter((s) => s.enabled).length} visible</p>
+            </div>
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() => setAdding((a) => !a)}
+                className="flex h-8 items-center gap-1 rounded-md bg-zinc-900 px-2.5 text-xs font-semibold text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900"
+                aria-expanded={adding}
               >
-                <Plus size={14} /> Add banner
-              </Button>
-            }
-          >
-            <div className="space-y-6">
-              {v.banners.length === 0 && <p className="text-sm text-zinc-500">No banners — the hero section will be hidden.</p>}
-              {v.banners.map((b, i) => (
-                <div key={b.id} className="rounded-md border border-zinc-200 p-4 dark:border-zinc-700">
-                  <div className="mb-3 flex items-center justify-between">
-                    <p className="text-sm font-semibold">Slide {i + 1}</p>
-                    <div className="flex gap-1">
-                      <button onClick={() => moveBanner(i, -1)} disabled={i === 0} className="rounded p-1.5 hover:bg-zinc-100 disabled:opacity-30 dark:hover:bg-zinc-800" aria-label="Move up"><ArrowUp size={15} /></button>
-                      <button onClick={() => moveBanner(i, 1)} disabled={i === v.banners.length - 1} className="rounded p-1.5 hover:bg-zinc-100 disabled:opacity-30 dark:hover:bg-zinc-800" aria-label="Move down"><ArrowDown size={15} /></button>
-                      <button onClick={() => setV({ ...v, banners: v.banners.filter((_, j) => j !== i) })} className="rounded p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30" aria-label="Delete slide"><Trash2 size={15} /></button>
-                    </div>
-                  </div>
-                  <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
-                    <SingleImageField value={b.image} onChange={(image) => setBanner(i, { image })} />
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Field label="Small heading"><Input value={b.eyebrow} onChange={(e) => setBanner(i, { eyebrow: e.target.value })} /></Field>
-                      <Field label="Text position">
-                        <Select value={b.align} onChange={(e) => setBanner(i, { align: e.target.value as Banner["align"] })}>
-                          <option value="left">Left</option>
-                          <option value="center">Centre</option>
-                        </Select>
-                      </Field>
-                      <Field label="Headline" className="sm:col-span-2"><Input value={b.title} onChange={(e) => setBanner(i, { title: e.target.value })} /></Field>
-                      <Field label="Description" className="sm:col-span-2"><Textarea rows={2} value={b.description} onChange={(e) => setBanner(i, { description: e.target.value })} /></Field>
-                      <Field label="Button text"><Input value={b.buttonText} onChange={(e) => setBanner(i, { buttonText: e.target.value })} /></Field>
-                      <Field label="Button link" hint="e.g. /shop?category=sarees"><Input value={b.link} onChange={(e) => setBanner(i, { link: e.target.value })} /></Field>
-                    </div>
-                  </div>
+                <Plus size={14} /> Add
+              </button>
+              {adding && (
+                <div className="absolute right-0 top-full z-30 mt-2 max-h-[70vh] w-80 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-2 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+                  <p className="px-2 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Content blocks — add as many as you like</p>
+                  {(Object.keys(BLOCK_TYPES) as BlockType[]).map((t) => {
+                    const I = BLOCK_ICONS[t];
+                    return (
+                      <button key={t} type="button" onClick={() => { addBlock(t); setAdding(false); }} className="flex w-full items-start gap-3 rounded-lg p-2 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                        <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800"><I size={16} /></span>
+                        <span>
+                          <span className="block text-sm font-medium">{BLOCK_TYPES[t].label}</span>
+                          <span className="block text-xs text-zinc-500">{BLOCK_TYPES[t].description}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                  {missingBuiltIns.length > 0 && (
+                    <>
+                      <p className="px-2 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Removed sections</p>
+                      {missingBuiltIns.map((id) => {
+                        const I = SECTION_ICONS[id];
+                        return (
+                          <button key={id} type="button" onClick={() => { addBuiltIn(id); setAdding(false); }} className="flex w-full items-center gap-3 rounded-lg p-2 text-left text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800"><I size={16} /></span>
+                            {HOMEPAGE_SECTIONS[id]}
+                          </button>
+                        );
+                      })}
+                    </>
+                  )}
                 </div>
-              ))}
+              )}
             </div>
-          </Panel>
-
-          <Panel title="Service highlights" description="Up to 4 short promises shown under the banner">
-            <div className="grid gap-4 sm:grid-cols-2">
-              {v.services.map((s, i) => (
-                <div key={i} className="space-y-2 rounded-md border border-zinc-200 p-3 dark:border-zinc-700">
-                  <div className="flex gap-2">
-                    <Select value={s.icon} onChange={(e) => setV({ ...v, services: v.services.map((x, j) => (j === i ? { ...x, icon: e.target.value as typeof s.icon } : x)) })} className="h-9 w-32" aria-label="Icon">
-                      {SERVICE_ICONS.map((ic) => (
-                        <option key={ic} value={ic}>{ic}</option>
-                      ))}
-                    </Select>
-                    <Input className="h-9" value={s.title} onChange={(e) => setV({ ...v, services: v.services.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)) })} aria-label="Title" />
-                    <button onClick={() => setV({ ...v, services: v.services.filter((_, j) => j !== i) })} className="rounded p-2 text-red-600" aria-label="Remove"><Trash2 size={15} /></button>
+          </div>
+          <ol className={cn("space-y-1 overflow-y-auto p-2", form.preview.on ? "max-h-72 2xl:max-h-[calc(100vh-14rem)]" : "max-h-[calc(100vh-14rem)]")}>
+            {sections.map((s, i) => {
+              const { name, detail, Icon } = label(s.id);
+              const active = current?.id === s.id;
+              return (
+                <li
+                  key={s.id}
+                  draggable
+                  onDragStart={(e) => {
+                    setDragIndex(i);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (dragIndex !== null && dragIndex !== i) {
+                      reorder(dragIndex, i);
+                      setDragIndex(i);
+                    }
+                  }}
+                  onDragEnd={() => setDragIndex(null)}
+                  className={cn(
+                    "group flex items-center gap-1.5 rounded-lg border px-1.5 py-1.5 text-sm transition-colors",
+                    active ? "border-zinc-900 bg-zinc-50 dark:border-white dark:bg-zinc-800" : "border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800/60",
+                    !s.enabled && "opacity-55",
+                    dragIndex === i && "opacity-40",
+                  )}
+                >
+                  <GripVertical size={15} className="flex-shrink-0 cursor-grab text-zinc-300 group-hover:text-zinc-500 dark:text-zinc-600" aria-hidden />
+                  <button type="button" onClick={() => select(s.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                    <Icon size={15} className="flex-shrink-0 text-zinc-500" />
+                    <span className="min-w-0">
+                      <span className={cn("block truncate", active && "font-semibold")}>{name}</span>
+                      {detail && <span className="block truncate text-[11px] text-zinc-500">{detail}</span>}
+                    </span>
+                  </button>
+                  <div className="flex flex-shrink-0 opacity-70 group-hover:opacity-100">
+                    <IconBtn label="Move up" onClick={() => reorder(i, i - 1)} disabled={i === 0}><span className="text-xs">↑</span></IconBtn>
+                    <IconBtn label="Move down" onClick={() => reorder(i, i + 1)} disabled={i === sections.length - 1}><span className="text-xs">↓</span></IconBtn>
+                    <IconBtn label={s.enabled ? `Hide ${name}` : `Show ${name}`} onClick={() => toggle(s.id)}>{s.enabled ? <Eye size={15} /> : <EyeOff size={15} />}</IconBtn>
                   </div>
-                  <Input className="h-9" value={s.description} onChange={(e) => setV({ ...v, services: v.services.map((x, j) => (j === i ? { ...x, description: e.target.value } : x)) })} aria-label="Description" />
+                </li>
+              );
+            })}
+          </ol>
+        </aside>
+
+        {/* Selected section */}
+        <div ref={detailRef} className="min-w-0 scroll-mt-20">
+          {current && cur ? (
+            <section className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex flex-wrap items-center gap-3 border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800"><cur.Icon size={18} /></span>
+                <div className="min-w-0 flex-1">
+                  <h2 className="truncate font-semibold">{cur.name}</h2>
+                  <p className="text-xs text-zinc-500">{curBlock ? BLOCK_TYPES[curBlock.type].description : "Built-in section"}</p>
                 </div>
-              ))}
-            </div>
-            {v.services.length < 4 && (
-              <Button size="sm" variant="outline" className="mt-3" onClick={() => setV({ ...v, services: [...v.services, { icon: "star", title: "", description: "" }] })}>
-                <Plus size={14} /> Add highlight
-              </Button>
-            )}
-          </Panel>
-
-          <Panel title="Promotional banner">
-            <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
-              <SingleImageField value={v.promo.image} onChange={(image) => setV({ ...v, promo: { ...v.promo, image } })} />
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Field label="Small heading"><Input value={v.promo.eyebrow} onChange={(e) => setV({ ...v, promo: { ...v.promo, eyebrow: e.target.value } })} /></Field>
-                <Field label="Headline"><Input value={v.promo.title} onChange={(e) => setV({ ...v, promo: { ...v.promo, title: e.target.value } })} /></Field>
-                <Field label="Text" className="sm:col-span-2"><Textarea rows={2} value={v.promo.subtitle} onChange={(e) => setV({ ...v, promo: { ...v.promo, subtitle: e.target.value } })} /></Field>
-                <Field label="Button text"><Input value={v.promo.buttonText} onChange={(e) => setV({ ...v, promo: { ...v.promo, buttonText: e.target.value } })} /></Field>
-                <Field label="Button link"><Input value={v.promo.link} onChange={(e) => setV({ ...v, promo: { ...v.promo, link: e.target.value } })} /></Field>
+                <button
+                  type="button"
+                  onClick={() => toggle(current.id)}
+                  className={cn("flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold", current.enabled ? "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400")}
+                >
+                  {current.enabled ? <Eye size={13} /> : <EyeOff size={13} />} {current.enabled ? "Visible" : "Hidden"}
+                </button>
+                {curBlock && <IconBtn label="Duplicate section" onClick={() => duplicate(current.id)}><Copy size={16} /></IconBtn>}
+                <IconBtn label="Remove section" danger onClick={() => remove(current.id)}><Trash2 size={16} /></IconBtn>
               </div>
-            </div>
-          </Panel>
-
-          <Panel title="Flash sale" description="Shows products marked “Flash sale”. Hidden automatically when the end time passes.">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Badge"><Input value={v.flashSale.badge} onChange={(e) => setV({ ...v, flashSale: { ...v.flashSale, badge: e.target.value } })} /></Field>
-              <Field label="Ends at" hint="Leave empty for no countdown">
-                <Input type="datetime-local" value={toLocalInput(v.flashSale.endsAt)} onChange={(e) => setV({ ...v, flashSale: { ...v.flashSale, endsAt: e.target.value ? new Date(e.target.value).toISOString() : "" } })} />
-              </Field>
-              <Field label="Title" className="sm:col-span-2"><Input value={v.flashSale.title} onChange={(e) => setV({ ...v, flashSale: { ...v.flashSale, title: e.target.value } })} /></Field>
-              <Field label="Text" className="sm:col-span-2"><Textarea rows={2} value={v.flashSale.subtitle} onChange={(e) => setV({ ...v, flashSale: { ...v.flashSale, subtitle: e.target.value } })} /></Field>
-            </div>
-          </Panel>
-
-          <Panel title="Brand story">
-            <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
-              <SingleImageField value={v.brandStory.image} onChange={(image) => setV({ ...v, brandStory: { ...v.brandStory, image } })} aspect="aspect-[4/5]" />
-              <div className="space-y-3">
-                <Field label="Small heading"><Input value={v.brandStory.eyebrow} onChange={(e) => setV({ ...v, brandStory: { ...v.brandStory, eyebrow: e.target.value } })} /></Field>
-                <Field label="Title"><Input value={v.brandStory.title} onChange={(e) => setV({ ...v, brandStory: { ...v.brandStory, title: e.target.value } })} /></Field>
-                <Field label="Story" hint="Blank line between paragraphs"><Textarea rows={6} value={v.brandStory.body} onChange={(e) => setV({ ...v, brandStory: { ...v.brandStory, body: e.target.value } })} /></Field>
+              <div className="space-y-5 p-5">
+                {curBlock ? (
+                  <BlockEditor block={curBlock} onChange={updateBlock} ctx={ctx} />
+                ) : (
+                  <SectionEditor id={current.id as HomepageSectionId} ctx={{ ...ctx, value: v, set }} />
+                )}
               </div>
-            </div>
-          </Panel>
-
-          <Panel title="Newsletter sign-up">
-            <div className="space-y-3">
-              <Field label="Title"><Input value={v.newsletter.title} onChange={(e) => setV({ ...v, newsletter: { ...v.newsletter, title: e.target.value } })} /></Field>
-              <Field label="Text"><Textarea rows={2} value={v.newsletter.description} onChange={(e) => setV({ ...v, newsletter: { ...v.newsletter, description: e.target.value } })} /></Field>
-            </div>
-          </Panel>
+            </section>
+          ) : (
+            <p className="rounded-xl border border-dashed border-zinc-300 p-10 text-center text-sm text-zinc-500 dark:border-zinc-700">Your homepage has no sections. Use “Add” to build it.</p>
+          )}
         </div>
       </div>
-      <SettingsSaveBar dirty={dirty} saving={saving} onSave={() => void save()} onReset={reset} />
-    </div>
+    </EditorShell>
   );
 }

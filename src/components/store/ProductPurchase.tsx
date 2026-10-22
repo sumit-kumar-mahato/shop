@@ -12,6 +12,8 @@ import { Modal } from "@/components/ui/Modal";
 import { Stars } from "@/components/ui/Misc";
 import { discountPercent, formatINR } from "@/lib/money";
 import { MAX_QTY_PER_LINE } from "@/lib/constants";
+import { defaultProductPageSettings, type ProductPageSettings } from "@/lib/settings-schema";
+import Icon from "@/components/ui/Icon";
 import { cn, textBlocks } from "@/lib/utils";
 
 type Variant = { id: string; size: string; color: string; colorHex: string | null; stock: number; price: number };
@@ -34,12 +36,17 @@ type Props = {
   variants: Variant[];
   sizeOrder: string[];
   delivery: { estimate: string; freeAbove: number; returnDays: number; cod: boolean; taxIncluded: boolean };
+  /** Product page options from Admin → Product page. */
+  page?: PurchasePageOptions;
   /** Slimmer layout used inside the Quick view panel. */
   compact?: boolean;
   onAdded?: () => void;
 };
 
-export default function ProductPurchase({ product, variants, sizeOrder, delivery, compact, onAdded }: Props) {
+export type PurchasePageOptions = Pick<ProductPageSettings, "showDeliveryInfo" | "highlights" | "showShare" | "sizeGuide">;
+
+export default function ProductPurchase({ product, variants, sizeOrder, delivery, page = defaultProductPageSettings, compact, onAdded }: Props) {
+  const guide = page.sizeGuide;
   const router = useRouter();
   const { add, openDrawer } = useCart();
   const wishlist = useWishlist();
@@ -176,9 +183,11 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
             <p className="text-sm">
               <span className="font-semibold">Size:</span> <span className="text-luxury-600 dark:text-zinc-400">{size ?? "Select a size"}</span>
             </p>
-            <button onClick={() => setGuideOpen(true)} className="flex items-center gap-1 text-sm font-medium underline-offset-2 hover:underline">
-              <Ruler size={14} /> Size guide
-            </button>
+            {guide.enabled && guide.rows.length > 0 && (
+              <button onClick={() => setGuideOpen(true)} className="flex items-center gap-1 text-sm font-medium underline-offset-2 hover:underline">
+                <Ruler size={14} /> Size guide
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             {sizesForColor.map((v) => (
@@ -251,24 +260,35 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
         </Link>
       ) : (
       <>
-      <ul className="grid gap-3 rounded-sm bg-luxury-100/70 p-4 text-sm dark:bg-zinc-900">
-        <li className="flex gap-3">
-          <Truck size={18} className="flex-shrink-0 text-brand" />
-          <span>
-            Delivery in {delivery.estimate}.{delivery.freeAbove > 0 && <> Free shipping above {formatINR(delivery.freeAbove)}.</>}
-          </span>
-        </li>
-        {delivery.returnDays > 0 && (
-          <li className="flex gap-3">
-            <RefreshCw size={18} className="flex-shrink-0 text-brand" /> Easy {delivery.returnDays}-day returns.
-          </li>
-        )}
-        {delivery.cod && (
-          <li className="flex gap-3">
-            <Wallet size={18} className="flex-shrink-0 text-brand" /> Cash on Delivery available.
-          </li>
-        )}
-      </ul>
+      {(page.showDeliveryInfo || page.highlights.length > 0) && (
+        <ul className="grid gap-3 rounded-sm bg-luxury-100/70 p-4 text-sm dark:bg-zinc-900">
+          {page.showDeliveryInfo && (
+            <>
+              <li className="flex gap-3">
+                <Truck size={18} className="flex-shrink-0 text-brand" />
+                <span>
+                  Delivery in {delivery.estimate}.{delivery.freeAbove > 0 && <> Free shipping above {formatINR(delivery.freeAbove)}.</>}
+                </span>
+              </li>
+              {delivery.returnDays > 0 && (
+                <li className="flex gap-3">
+                  <RefreshCw size={18} className="flex-shrink-0 text-brand" /> Easy {delivery.returnDays}-day returns.
+                </li>
+              )}
+              {delivery.cod && (
+                <li className="flex gap-3">
+                  <Wallet size={18} className="flex-shrink-0 text-brand" /> Cash on Delivery available.
+                </li>
+              )}
+            </>
+          )}
+          {page.highlights.map((h, i) => (
+            <li key={i} className="flex gap-3">
+              <Icon name={h.icon} size={18} className="flex-shrink-0 text-brand" /> {h.text}
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="divide-y divide-luxury-200 border-y border-luxury-200 dark:divide-zinc-800 dark:border-zinc-800">
         <Details title="Description" defaultOpen>
@@ -287,9 +307,11 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
         {product.careInstructions && <Details title="Care">{product.careInstructions}</Details>}
       </div>
 
-      <button onClick={share} className="flex items-center gap-2 text-sm text-luxury-600 hover:text-luxury-900 dark:text-zinc-400 dark:hover:text-white">
-        <Share2 size={16} /> Share this product
-      </button>
+      {page.showShare && (
+        <button onClick={share} className="flex items-center gap-2 text-sm text-luxury-600 hover:text-luxury-900 dark:text-zinc-400 dark:hover:text-white">
+          <Share2 size={16} /> Share this product
+        </button>
+      )}
       </>
       )}
 
@@ -318,33 +340,28 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
       )}
 
       <Modal open={guideOpen} onClose={() => setGuideOpen(false)} title="Size guide">
-        <p className="mb-4 text-sm text-luxury-600 dark:text-zinc-400">Measurements are body measurements in inches. If you are between sizes, choose the larger size for a relaxed fit.</p>
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-luxury-200 dark:border-zinc-700">
-              {["Size", "Chest", "Waist", "Hip"].map((h) => (
-                <th key={h} className="py-2 font-semibold">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-luxury-100 dark:divide-zinc-800">
-            {[
-              ["XS", "32–34", "26–28", "34–36"],
-              ["S", "34–36", "28–30", "36–38"],
-              ["M", "38–40", "32–34", "38–40"],
-              ["L", "40–42", "34–36", "40–42"],
-              ["XL", "42–44", "36–38", "42–44"],
-              ["XXL", "44–46", "38–40", "44–46"],
-            ].map((row) => (
-              <tr key={row[0]}>
-                {row.map((c, i) => (
-                  <td key={i} className={cn("py-2", i === 0 && "font-semibold")}>{c}</td>
+        {guide.intro && <p className="mb-4 text-sm text-luxury-600 dark:text-zinc-400">{guide.intro}</p>}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-luxury-200 dark:border-zinc-700">
+                {guide.columns.map((h, i) => (
+                  <th key={i} className="py-2 pr-3 font-semibold">{h}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <p className="mt-4 text-xs text-luxury-500">For trousers & jeans, the number size is your waist in inches (e.g. 32).</p>
+            </thead>
+            <tbody className="divide-y divide-luxury-100 dark:divide-zinc-800">
+              {guide.rows.map((row, r) => (
+                <tr key={r}>
+                  {guide.columns.map((_, i) => (
+                    <td key={i} className={cn("py-2 pr-3", i === 0 && "font-semibold")}>{row[i] ?? ""}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {guide.note && <p className="mt-4 text-xs text-luxury-500">{guide.note}</p>}
       </Modal>
     </div>
   );

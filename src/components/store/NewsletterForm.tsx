@@ -4,7 +4,8 @@ import { useState } from "react";
 import { api, errorMessage } from "@/lib/fetcher";
 import { cn } from "@/lib/utils";
 
-export default function NewsletterForm({ compact, dark }: { compact?: boolean; dark?: boolean }) {
+export default function NewsletterForm({ compact, dark, id, onDone }: { compact?: boolean; dark?: boolean; id?: string; onDone?: () => void }) {
+  const inputId = id ?? (compact ? "nl-footer" : "nl-home");
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -17,6 +18,7 @@ export default function NewsletterForm({ compact, dark }: { compact?: boolean; d
       setState("done");
       setMessage("Thank you for subscribing!");
       setEmail("");
+      onDone?.();
     } catch (err) {
       setState("error");
       setMessage(errorMessage(err));
@@ -26,9 +28,9 @@ export default function NewsletterForm({ compact, dark }: { compact?: boolean; d
   return (
     <form onSubmit={submit} className="space-y-2">
       <div className={cn("flex gap-2", !compact && "flex-col sm:flex-row")}>
-        <label htmlFor={compact ? "nl-footer" : "nl-home"} className="sr-only">Email address</label>
+        <label htmlFor={inputId} className="sr-only">Email address</label>
         <input
-          id={compact ? "nl-footer" : "nl-home"}
+          id={inputId}
           type="email"
           required
           value={email}
@@ -43,7 +45,7 @@ export default function NewsletterForm({ compact, dark }: { compact?: boolean; d
           type="submit"
           disabled={state === "loading"}
           className={cn(
-            "h-11 rounded-sm px-5 text-sm font-semibold transition-colors disabled:opacity-60",
+            "h-11 rounded-btn px-5 text-sm font-semibold transition-colors disabled:opacity-60",
             dark ? "bg-white text-zinc-950 hover:bg-brand" : "bg-luxury-900 text-white hover:bg-luxury-800 dark:bg-white dark:text-zinc-900",
           )}
         >

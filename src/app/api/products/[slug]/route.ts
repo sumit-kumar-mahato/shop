@@ -12,7 +12,7 @@ export const GET = route<{ params: { slug: string } }>(async (_req, { params }) 
     include: { category: { select: { name: true } }, variants: { where: { isActive: true }, orderBy: { position: "asc" } } },
   });
   if (!product) throw new ApiError(404, "Product not found.");
-  const store = await getSettings("store");
+  const [store, page] = await Promise.all([getSettings("store"), getSettings("productPage")]);
 
   const variants = product.variants.map((v) => ({ id: v.id, size: v.size, color: v.color, colorHex: v.colorHex, stock: v.stock, price: v.price ?? product.price }));
   return ok({
@@ -40,5 +40,6 @@ export const GET = route<{ params: { slug: string } }>(async (_req, { params }) 
       cod: store.payments.codEnabled,
       taxIncluded: store.tax.pricesIncludeTax,
     },
+    page: { showDeliveryInfo: page.showDeliveryInfo, highlights: page.highlights, showShare: page.showShare, sizeGuide: page.sizeGuide },
   });
 });

@@ -23,6 +23,11 @@ module.exports = {
           900: "#1f1c17",
         },
       },
+      // Corner and button shapes are driven by Admin → Appearance (see app/layout.tsx).
+      borderRadius: {
+        sm: "var(--radius-sm, 0.125rem)",
+        btn: "var(--radius-btn, 9999px)",
+      },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],

@@ -8,8 +8,9 @@ export const metadata: Metadata = { title: { default: "Admin", template: "%s · 
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await requireStaffPage();
-  const [store, pendingOrders, pendingReviews, unreadMessages] = await Promise.all([
+  const [store, theme, pendingOrders, pendingReviews, unreadMessages] = await Promise.all([
     getSettings("store"),
+    getSettings("theme"),
     prisma.order.count({ where: { status: { in: ["CONFIRMED", "PROCESSING"] } } }),
     prisma.review.count({ where: { status: "PENDING" } }),
     prisma.contactMessage.count({ where: { isRead: false } }),
@@ -18,7 +19,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <AdminShell
       user={{ name: user.name, email: user.email, role: user.role }}
-      storeName={store.logoText}
+      storeName={store.storeName}
+      logoImage={theme.logo.image}
       badges={{ orders: pendingOrders, reviews: pendingReviews, messages: unreadMessages }}
     >
       {children}

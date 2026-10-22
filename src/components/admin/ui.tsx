@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function PageHeader({ title, description, actions, back }: { title: string; description?: string; actions?: React.ReactNode; back?: { href: string; label: string } }) {
@@ -11,8 +11,8 @@ export function PageHeader({ title, description, actions, back }: { title: strin
         </Link>
       )}
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <div className="max-w-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-[28px]">{title}</h1>
           {description && <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{description}</p>}
         </div>
         {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -23,9 +23,9 @@ export function PageHeader({ title, description, actions, back }: { title: strin
 
 export function Panel({ title, description, actions, children, className, padded = true }: { title?: string; description?: string; actions?: React.ReactNode; children: React.ReactNode; className?: string; padded?: boolean }) {
   return (
-    <section className={cn("rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900", className)}>
+    <section className={cn("rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900", className)}>
       {(title || actions) && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
           <div>
             {title && <h2 className="font-semibold">{title}</h2>}
             {description && <p className="text-sm text-zinc-500 dark:text-zinc-400">{description}</p>}
@@ -47,7 +47,7 @@ export function Table({ children }: { children: React.ReactNode }) {
 }
 
 export function Th({ children, className }: { children?: React.ReactNode; className?: string }) {
-  return <th className={cn("whitespace-nowrap border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/60", className)}>{children}</th>;
+  return <th className={cn("whitespace-nowrap border-b border-zinc-200 bg-zinc-50/80 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/60", className)}>{children}</th>;
 }
 
 export function Td({ children, className }: { children?: React.ReactNode; className?: string }) {
@@ -87,22 +87,50 @@ export function withParams(path: string, params: Record<string, string | undefin
   return qs ? `${path}?${qs}` : path;
 }
 
-export function StatCard({ label, value, hint, trend, icon }: { label: string; value: string; hint?: string; trend?: number | null; icon?: React.ReactNode }) {
+/** Tiny line chart for stat cards. */
+export function Sparkline({ values, className }: { values: number[]; className?: string }) {
+  if (values.length < 2) return null;
+  const max = Math.max(...values, 1);
+  const w = 100;
+  const h = 32;
+  const pts = values.map((v, i) => [(i / (values.length - 1)) * w, h - 2 - (v / max) * (h - 4)] as const);
+  const line = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className={cn("h-8 w-full overflow-visible", className)} aria-hidden>
+      <path d={`${line} L${w},${h} L0,${h} Z`} className="fill-current opacity-[0.08]" />
+      <path d={line} className="fill-none stroke-current" strokeWidth={1.75} vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function StatCard({ label, value, hint, trend, icon, spark, href }: { label: string; value: string; hint?: string; trend?: number | null; icon?: React.ReactNode; spark?: number[]; href?: string }) {
+  const body = (
+    <>
       <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
         {label}
-        {icon}
+        {icon && <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{icon}</span>}
       </div>
-      <p className="mt-2 text-2xl font-semibold tracking-tight">{value}</p>
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="mt-2 text-[26px] font-semibold tracking-tight tabular-nums">{value}</p>
+      <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-500">
         {trend != null && Number.isFinite(trend) && (
-          <span className={cn("mr-1 font-semibold", trend >= 0 ? "text-green-600" : "text-red-600")}>
-            {trend >= 0 ? "▲" : "▼"} {Math.abs(trend).toFixed(0)}%
+          <span className={cn("rounded-full px-1.5 py-0.5 font-semibold", trend >= 0 ? "bg-green-50 text-green-700 dark:bg-green-950/50 dark:text-green-400" : "bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-400")}>
+            {trend >= 0 ? "↑" : "↓"} {Math.abs(trend).toFixed(0)}%
           </span>
         )}
         {hint}
       </p>
-    </div>
+      {spark && <Sparkline values={spark} className={cn("mt-3", trend != null && trend < 0 ? "text-red-500" : "text-zinc-900 dark:text-zinc-100")} />}
+    </>
+  );
+  const cls = "block rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-shadow dark:border-zinc-800 dark:bg-zinc-900";
+  return href ? <Link href={href} className={cn(cls, "hover:shadow-md")}>{body}</Link> : <div className={cls}>{body}</div>;
+}
+
+/** "View on store" button for page headers. */
+export function ViewStoreLink({ href = "/", label = "View store" }: { href?: string; label?: string }) {
+  return (
+    <Link href={href} target="_blank" className="inline-flex h-9 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+      {label} <ExternalLink size={14} />
+    </Link>
   );
 }

@@ -77,3 +77,15 @@ export const MAX_QTY_PER_LINE = 10;
 export const PENDING_PAYMENT_TTL_MINUTES = 30;
 export const PRODUCTS_PER_PAGE = 24;
 export const SESSION_COOKIE = "pkm_session";
+/** Request header the middleware sets for admin live-preview requests (`?pkm_preview=1`). */
+export const PREVIEW_HEADER = "x-pkm-preview";
+
+/** Homepage placement flags on products (shown in homepage sections and product blocks). */
+export const PRODUCT_FLAGS = {
+  isNewArrival: "New arrival",
+  isBestSeller: "Best seller",
+  isFeatured: "Featured",
+  isTrending: "Trending",
+  isFlashSale: "Flash sale",
+} as const;
+export type ProductFlag = keyof typeof PRODUCT_FLAGS;

@@ -9,9 +9,10 @@ export const metadata: Metadata = { title: "Checkout", robots: { index: false } 
 
 export default async function CheckoutPage() {
   const user = await requireUserPage("/checkout");
-  const [addresses, store] = await Promise.all([
+  const [addresses, store, theme] = await Promise.all([
     prisma.address.findMany({ where: { userId: user.id }, orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }] }),
     getSettings("store"),
+    getSettings("theme"),
   ]);
 
   return (
@@ -25,7 +26,7 @@ export default async function CheckoutPage() {
       }}
       requireVerification={store.orders.requireEmailVerification}
       storeName={store.storeName}
-      brandColor={store.primaryColor}
+      brandColor={theme.primaryColor}
       taxRate={store.tax.ratePercent}
     />
   );

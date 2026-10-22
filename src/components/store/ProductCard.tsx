@@ -6,6 +6,7 @@ import { Eye, Heart, Plus } from "lucide-react";
 import { useCart } from "@/components/providers/CartProvider";
 import { useWishlist } from "@/components/providers/WishlistProvider";
 import { useToast } from "@/components/ui/Toast";
+import { CARD_ASPECT, useStoreUI } from "@/components/providers/StoreUIProvider";
 import SmartImage from "@/components/ui/SmartImage";
 import Reveal from "@/components/ui/Reveal";
 import { discountPercent, formatINR } from "@/lib/money";
@@ -17,6 +18,7 @@ export default function ProductCard({ product, priority }: { product: ProductCar
   const { add, openDrawer } = useCart();
   const wishlist = useWishlist();
   const toast = useToast();
+  const { card } = useStoreUI();
   const [adding, setAdding] = useState(false);
   const [quickView, setQuickView] = useState(false);
   const [pop, setPop] = useState(false);
@@ -43,7 +45,7 @@ export default function ProductCard({ product, priority }: { product: ProductCar
 
   return (
     <div className="group relative flex flex-col">
-      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-luxury-100 dark:bg-zinc-900">
+      <div className={cn("relative overflow-hidden rounded-sm bg-luxury-100 dark:bg-zinc-900", CARD_ASPECT[card.imageRatio])}>
         <Link href={`/product/${product.slug}`} aria-label={product.title} className="absolute inset-0">
           <SmartImage
             src={product.image}
@@ -52,7 +54,7 @@ export default function ProductCard({ product, priority }: { product: ProductCar
             className="absolute inset-0"
             imgClassName={cn("transition-transform duration-[1.2s] ease-out group-hover:scale-[1.06]", soldOut && "grayscale-[40%]")}
           />
-          {product.hoverImage && (
+          {card.hoverImage && product.hoverImage && (
             <SmartImage
               src={product.hoverImage}
               alt=""
@@ -69,7 +71,7 @@ export default function ProductCard({ product, priority }: { product: ProductCar
             <Badge className="bg-brand text-brand-fg">−{off}%</Badge>
           ) : null}
           {product.isNewArrival && !soldOut && <Badge className="bg-white/90 text-luxury-900 backdrop-blur">New</Badge>}
-          {!soldOut && product.totalStock <= 3 && <Badge className="bg-red-600 text-white">Only {product.totalStock} left</Badge>}
+          {!soldOut && product.totalStock <= card.lowStockBadgeAt &&<Badge className="bg-red-600 text-white">Only {product.totalStock} left</Badge>}
         </div>
 
         <button
@@ -87,16 +89,18 @@ export default function ProductCard({ product, priority }: { product: ProductCar
 
         {!soldOut && (
           <div className="absolute inset-x-3 bottom-3 flex translate-y-3 gap-2 opacity-0 transition-all duration-500 ease-out group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-lg:translate-y-0 max-lg:opacity-100">
-            <button
-              onClick={quickAdd}
-              disabled={adding}
-              className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-white/95 text-xs font-semibold uppercase tracking-wider text-luxury-900 shadow-lg backdrop-blur transition-colors hover:bg-luxury-900 hover:text-white disabled:opacity-60 max-lg:hidden"
-            >
-              <Plus size={15} /> {adding ? "Adding…" : product.quickAddVariantId ? "Quick add" : "Choose size"}
-            </button>
+            {card.quickAdd && (
+              <button
+                onClick={quickAdd}
+                disabled={adding}
+                className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-btn bg-white/95 text-xs font-semibold uppercase tracking-wider text-luxury-900 shadow-lg backdrop-blur transition-colors hover:bg-luxury-900 hover:text-white disabled:opacity-60 max-lg:hidden"
+              >
+                <Plus size={15} /> {adding ? "Adding…" : product.quickAddVariantId ? "Quick add" : "Choose size"}
+              </button>
+            )}
             <button
               onClick={() => setQuickView(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-luxury-900 shadow-lg backdrop-blur transition-colors hover:bg-luxury-900 hover:text-white max-lg:ml-auto max-lg:h-9 max-lg:w-9"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-luxury-900 shadow-lg backdrop-blur transition-colors hover:bg-luxury-900 hover:text-white ml-auto max-lg:h-9 max-lg:w-9"
               aria-label={`Quick view ${product.title}`}
             >
               <Eye size={16} />
@@ -110,17 +114,17 @@ export default function ProductCard({ product, priority }: { product: ProductCar
           <Link href={`/product/${product.slug}`} className="line-clamp-1 text-sm font-medium text-luxury-900 transition-colors hover:text-brand dark:text-zinc-100">
             {product.title}
           </Link>
-          {product.ratingCount > 0 && (
+          {card.showRating && product.ratingCount > 0 && (
             <span className="flex-shrink-0 text-xs text-luxury-500">★ {product.ratingAvg.toFixed(1)}</span>
           )}
         </div>
-        {product.categoryName && <p className="text-[11px] uppercase tracking-[0.15em] text-luxury-500">{product.categoryName}</p>}
+        {card.showCategory && product.categoryName && <p className="text-[11px] uppercase tracking-[0.15em] text-luxury-500">{product.categoryName}</p>}
         <div className="flex items-center justify-between gap-2">
           <p className="flex items-baseline gap-2">
             <span className="text-sm font-semibold">{formatINR(product.price)}</span>
             {off > 0 && product.compareAtPrice && <span className="text-xs text-luxury-400 line-through">{formatINR(product.compareAtPrice)}</span>}
           </p>
-          {product.colors.length > 1 && (
+          {card.showColors && product.colors.length > 1 && (
             <span className="flex items-center gap-1" aria-label={`${product.colors.length} colours`}>
               {product.colors.slice(0, 4).map((c) => (
                 <span key={c.name} title={c.name} className="h-3 w-3 rounded-full ring-1 ring-black/10 dark:ring-white/20" style={{ backgroundColor: c.hex ?? "#ccc" }} />

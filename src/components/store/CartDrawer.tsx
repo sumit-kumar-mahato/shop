@@ -8,7 +8,7 @@ import { formatINR } from "@/lib/money";
 import { LinkButton } from "@/components/ui/Button";
 import CartLineItem from "./CartLineItem";
 
-export default function CartDrawer({ estimatedDelivery }: { codEnabled: boolean; estimatedDelivery: string }) {
+export default function CartDrawer({ estimatedDelivery, freeShippingBar = true }: { codEnabled: boolean; estimatedDelivery: string; freeShippingBar?: boolean }) {
   const { quote, drawerOpen, closeDrawer, count, loading } = useCart();
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function CartDrawer({ estimatedDelivery }: { codEnabled: boolean;
           </button>
         </div>
 
-        {lines.length > 0 && threshold > 0 && (
+        {freeShippingBar && lines.length > 0 && threshold > 0 && (
           <div className="border-b border-luxury-100 bg-luxury-50 px-5 py-3 text-sm dark:border-zinc-800 dark:bg-zinc-950">
             <p className="flex items-center gap-2">
               <Truck size={16} className="text-brand" />

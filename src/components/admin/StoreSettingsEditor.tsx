@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Checkbox, Field, FormError, Input, Textarea } from "@/components/ui/Form";
 import { Panel } from "@/components/admin/ui";
@@ -23,13 +24,10 @@ export default function StoreSettingsEditor({ initial, integrations }: { initial
             <Field label="Store name" hint="Used in page titles, emails and invoices"><Input value={v.storeName} onChange={(e) => set("storeName", e.target.value)} /></Field>
             <Field label="Logo text" hint="Shown in the header"><Input value={v.logoText} onChange={(e) => set("logoText", e.target.value)} /></Field>
             <Field label="Tagline"><Input value={v.tagline} onChange={(e) => set("tagline", e.target.value)} /></Field>
-            <Field label="Brand colour" hint="Used for buttons, badges and highlights across the site">
-              <div className="flex items-center gap-3">
-                <input type="color" value={v.primaryColor} onChange={(e) => set("primaryColor", e.target.value)} className="h-11 w-14 cursor-pointer rounded border border-zinc-200 dark:border-zinc-700" aria-label="Pick brand colour" />
-                <Input value={v.primaryColor} onChange={(e) => set("primaryColor", e.target.value)} className="w-32 font-mono" />
-                <span className="rounded-sm px-3 py-2 text-sm font-semibold" style={{ background: v.primaryColor }}>Preview</span>
-              </div>
-            </Field>
+            <p className="rounded-md bg-zinc-50 p-3 text-xs text-zinc-600 dark:bg-zinc-950 dark:text-zinc-400">
+              Colours, fonts, logo image and layout options are under{" "}
+              <Link href="/admin/appearance" className="font-semibold text-zinc-900 underline dark:text-white">Appearance</Link>.
+            </p>
           </div>
         </Panel>
 

@@ -6,9 +6,33 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Banner } from "@/lib/settings-schema";
 import { cn } from "@/lib/utils";
 
-const SLIDE_MS = 7000;
+const HEIGHTS = {
+  full: "h-[100svh] min-h-[620px]",
+  large: "h-[85vh] min-h-[560px]",
+  medium: "h-[62vh] min-h-[460px]",
+};
 
-export default function HeroSlider({ banners, fullScreen }: { banners: Banner[]; fullScreen?: boolean }) {
+/** Darkening over the photo so text stays readable; strength (0–90) is set per slide in the admin. */
+function overlayStyle(align: Banner["align"], strength: number): React.CSSProperties {
+  const a = strength / 100;
+  if (align === "center") return { background: `rgb(0 0 0 / ${a})` };
+  return { background: `linear-gradient(to right, rgb(0 0 0 / ${Math.min(0.95, a + 0.25)}), rgb(0 0 0 / ${a * 0.7}) 50%, rgb(0 0 0 / ${a * 0.1}))` };
+}
+
+export default function HeroSlider({
+  banners,
+  height = "full",
+  underHeader,
+  intervalSeconds = 7,
+  kenBurns = true,
+}: {
+  banners: Banner[];
+  height?: keyof typeof HEIGHTS;
+  underHeader?: boolean;
+  intervalSeconds?: number;
+  kenBurns?: boolean;
+}) {
+  const SLIDE_MS = intervalSeconds * 1000;
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const count = banners.length;
@@ -20,7 +44,7 @@ export default function HeroSlider({ banners, fullScreen }: { banners: Banner[];
   const startedAt = useRef(0);
   useEffect(() => {
     remaining.current = SLIDE_MS;
-  }, [current]);
+  }, [current, SLIDE_MS]);
   useEffect(() => {
     if (count <= 1) return;
     if (paused) return;
@@ -40,7 +64,7 @@ export default function HeroSlider({ banners, fullScreen }: { banners: Banner[];
 
   return (
     <section
-      className={cn("relative w-full overflow-hidden bg-zinc-950 text-white", fullScreen ? "h-[100svh] min-h-[620px]" : "h-[78vh] min-h-[520px]")}
+      className={cn("relative w-full overflow-hidden bg-zinc-950 text-white", HEIGHTS[height])}
       aria-roledescription="carousel"
       aria-label="Featured collections"
       onMouseEnter={() => setPaused(true)}
@@ -59,20 +83,23 @@ export default function HeroSlider({ banners, fullScreen }: { banners: Banner[];
           className={cn("absolute inset-0 transition-opacity duration-[1400ms] ease-out", i === current ? "z-10 opacity-100" : "z-0 opacity-0")}
           aria-hidden={i !== current}
         >
-          <img
-            src={slide.image}
-            alt=""
-            className={cn("absolute inset-0 h-full w-full object-cover", i === current && "animate-kenburns")}
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-          />
-          <div className={cn("absolute inset-0", slide.align === "center" ? "bg-black/45" : "bg-gradient-to-r from-black/80 via-black/40 to-black/5")} />
+          <picture>
+            {slide.mobileImage && <source media="(max-width: 767px)" srcSet={slide.mobileImage} />}
+            <img
+              src={slide.image}
+              alt=""
+              className={cn("absolute inset-0 h-full w-full object-cover", kenBurns && i === current && "animate-kenburns")}
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "auto"}
+            />
+          </picture>
+          <div className="absolute inset-0" style={overlayStyle(slide.align, slide.overlay)} />
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
       ))}
 
       {/* Text — keyed by slide so the entrance animation replays on every change */}
-      <div className={cn("container-page relative z-20 flex h-full flex-col justify-center", fullScreen && "pt-20", b.align === "center" && "items-center text-center")}>
+      <div className={cn("container-page relative z-20 flex h-full flex-col justify-center", underHeader && "pt-20", b.align === "center" && "items-center text-center")}>
         <div key={b.id} className="max-w-2xl">
           {b.eyebrow && (
             <div className="overflow-hidden">
@@ -95,13 +122,15 @@ export default function HeroSlider({ banners, fullScreen }: { banners: Banner[];
           )}
           {b.buttonText && b.link && (
             <div className={cn("mt-9 flex animate-fade-in-up flex-wrap gap-3", b.align === "center" && "justify-center")} style={{ animationDelay: "500ms" }}>
-              <Link href={b.link} className="group inline-flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-zinc-950 transition-all hover:bg-brand hover:text-brand-fg">
+              <Link href={b.link} className="group inline-flex h-12 items-center gap-2 rounded-btn bg-white px-8 text-sm font-semibold text-zinc-950 transition-all hover:bg-brand hover:text-brand-fg">
                 {b.buttonText}
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link href="/shop" className="inline-flex h-12 items-center rounded-full border border-white/40 px-8 text-sm font-semibold backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10">
-                Explore all
-              </Link>
+              {b.secondaryText && b.secondaryLink && (
+                <Link href={b.secondaryLink} className="inline-flex h-12 items-center rounded-btn border border-white/40 px-8 text-sm font-semibold backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10">
+                  {b.secondaryText}
+                </Link>
+              )}
             </div>
           )}
         </div>
@@ -135,7 +164,7 @@ export default function HeroSlider({ banners, fullScreen }: { banners: Banner[];
           <span />
         )}
 
-        {fullScreen && (
+        {height === "full" && (
           <div className="absolute left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-white/60 md:flex">
             Scroll
             <span className="relative h-8 w-[1px] overflow-hidden bg-white/20">

@@ -38,12 +38,12 @@ export async function sendMail(to: string, subject: string, html: string) {
 }
 
 async function layout(title: string, body: string) {
-  const store = await getSettings("store");
+  const [store, theme] = await Promise.all([getSettings("store"), getSettings("theme")]);
   const brand = escapeHtml(store.storeName);
   return `<!doctype html><html><body style="margin:0;background:#f5f4ef;font-family:Arial,Helvetica,sans-serif;color:#1f1c17">
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 12px"><tr><td align="center">
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border:1px solid #e6e3d8">
-    <tr><td style="padding:20px 28px;border-bottom:3px solid ${store.primaryColor};font-size:18px;font-weight:bold;letter-spacing:2px">${brand}</td></tr>
+    <tr><td style="padding:20px 28px;border-bottom:3px solid ${theme.primaryColor};font-size:18px;font-weight:bold;letter-spacing:2px">${brand}</td></tr>
     <tr><td style="padding:28px">
       <h1 style="margin:0 0 16px;font-size:20px">${escapeHtml(title)}</h1>
       ${body}

@@ -60,8 +60,9 @@ export default async function ProductPage({ params }: Props) {
   const isStaff = user?.role === "ADMIN" || user?.role === "STAFF";
   if (product.status !== "ACTIVE" && !isStaff) notFound();
 
-  const [store, reviews, myReview, related] = await Promise.all([
+  const [store, page, reviews, myReview, related] = await Promise.all([
     getSettings("store"),
+    getSettings("productPage"),
     prisma.review.findMany({
       where: { productId: product.id, status: "APPROVED" },
       orderBy: { createdAt: "desc" },
@@ -153,36 +154,41 @@ export default async function ProductPage({ params }: Props) {
             cod: store.payments.codEnabled,
             taxIncluded: store.tax.pricesIncludeTax,
           }}
+          page={page}
         />
         </div>
       </div>
 
-      <ProductReviews
-        productId={product.id}
-        ratingAvg={product.ratingAvg}
-        ratingCount={product.ratingCount}
-        distribution={distribution}
-        reviews={reviews.map((r) => ({
-          id: r.id,
-          rating: r.rating,
-          title: r.title,
-          comment: r.comment,
-          author: r.user.name.split(" ")[0],
-          verified: r.isVerifiedPurchase,
-          createdAt: r.createdAt.toISOString(),
-        }))}
-        signedIn={Boolean(user)}
-        myReviewStatus={myReview?.status ?? null}
-      />
+      {page.showReviews && (
+        <ProductReviews
+          productId={product.id}
+          ratingAvg={product.ratingAvg}
+          ratingCount={product.ratingCount}
+          distribution={distribution}
+          reviews={reviews.map((r) => ({
+            id: r.id,
+            rating: r.rating,
+            title: r.title,
+            comment: r.comment,
+            author: r.user.name.split(" ")[0],
+            verified: r.isVerifiedPurchase,
+            createdAt: r.createdAt.toISOString(),
+          }))}
+          signedIn={Boolean(user)}
+          myReviewStatus={myReview?.status ?? null}
+        />
+      )}
 
-      {related.length > 0 && (
+      {page.showCompleteTheLook && related.length > 0 && (
         <div className="-mx-4 mt-24 border-t border-luxury-200 pt-20 dark:border-zinc-800 sm:-mx-6 lg:-mx-8">
-          <ProductRail eyebrow="You may also like" title="Complete the Look" products={related} href={product.category ? `/shop?category=${product.category.slug}` : "/shop"} />
+          <ProductRail eyebrow="You may also like" title={page.completeTheLookTitle || "Complete the Look"} products={related} href={product.category ? `/shop?category=${product.category.slug}` : "/shop"} />
         </div>
       )}
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8">
-        <RecentlyViewed currentSlug={product.slug} />
-      </div>
+      {page.showRecentlyViewed && (
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8">
+          <RecentlyViewed currentSlug={product.slug} />
+        </div>
+      )}
     </div>
   );
 }
