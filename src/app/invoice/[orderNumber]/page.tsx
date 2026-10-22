@@ -31,7 +31,8 @@ export default async function InvoicePage({ params }: { params: { orderNumber: s
             {store.gstin && <p className="text-sm text-zinc-600">GSTIN: {store.gstin}</p>}
           </div>
           <div className="text-right text-sm">
-            <p className="text-2xl font-semibold uppercase tracking-wider">Tax invoice</p>
+            {/* Only GST-registered sellers may issue a "tax invoice" or show GST. */}
+            <p className="text-2xl font-semibold uppercase tracking-wider">{store.gstin ? "Tax invoice" : "Invoice"}</p>
             <p className="mt-2">Invoice no: <strong>{order.orderNumber}</strong></p>
             <p>Date: {formatDate(order.createdAt)}</p>
             <p>Payment: {PAYMENT_METHOD_LABELS[order.paymentMethod]} ({PAYMENT_STATUS_LABELS[order.paymentStatus]})</p>
@@ -78,7 +79,7 @@ export default async function InvoicePage({ params }: { params: { orderNumber: s
           <Row label="Subtotal" value={formatINR(order.subtotal)} />
           {order.discount > 0 && <Row label={`Discount${order.couponCode ? ` (${order.couponCode})` : ""}`} value={`−${formatINR(order.discount)}`} />}
           <Row label="Shipping" value={order.shippingFee ? formatINR(order.shippingFee) : "Free"} />
-          <Row label={order.taxIncluded ? "GST (included)" : "GST"} value={formatINR(order.tax)} />
+          {store.gstin && order.tax > 0 && <Row label={order.taxIncluded ? "GST (included)" : "GST"} value={formatINR(order.tax)} />}
           <div className="flex justify-between border-t-2 border-zinc-900 pt-2 text-base font-semibold">
             <dt>Total</dt>
             <dd>{formatINR(order.total)}</dd>

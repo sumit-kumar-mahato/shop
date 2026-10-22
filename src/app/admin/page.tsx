@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { AlertTriangle, IndianRupee, Package, ShoppingCart, Users } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2, Circle, IndianRupee, Package, ShoppingCart, Users } from "lucide-react";
+import { getLaunchChecklist } from "@/lib/launch-checklist";
 import { prisma, table } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { expireStalePendingOrders } from "@/lib/orders";
@@ -21,7 +22,8 @@ function pctChange(now: number, before: number) {
 
 export default async function AdminDashboard() {
   await expireStalePendingOrders();
-  const store = await getSettings("store");
+  const [store, checklist] = await Promise.all([getSettings("store"), getLaunchChecklist()]);
+  const todo = checklist.filter((c) => !c.done);
   const now = Date.now();
   const since30 = new Date(now - 30 * DAY);
   const since60 = new Date(now - 60 * DAY);
@@ -73,6 +75,27 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-6">
       <PageHeader title="Dashboard" description="Your store's performance over the last 30 days." />
+
+      {todo.length > 0 && (
+        <Panel title="Launch checklist" description={`${checklist.length - todo.length} of ${checklist.length} done — finish these before taking real orders.`}>
+          <ul className="space-y-3">
+            {checklist.map((c) => (
+              <li key={c.title} className="flex gap-3 text-sm">
+                {c.done ? <CheckCircle2 size={18} className="mt-0.5 flex-shrink-0 text-green-600" /> : <Circle size={18} className="mt-0.5 flex-shrink-0 text-amber-500" />}
+                <div className="flex-1">
+                  <p className={c.done ? "text-zinc-500 line-through" : "font-medium"}>{c.title}</p>
+                  {!c.done && <p className="text-zinc-500 dark:text-zinc-400">{c.detail}</p>}
+                </div>
+                {!c.done && c.href && (
+                  <Link href={c.href} className="flex flex-shrink-0 items-center gap-1 self-start font-medium hover:underline">
+                    Fix <ArrowRight size={14} />
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Revenue" value={formatINR(revenue)} trend={pctChange(revenue, prev._sum.total ?? 0)} hint="vs previous 30 days" icon={<IndianRupee size={16} />} />

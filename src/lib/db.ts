@@ -11,7 +11,7 @@ export const DB_SCHEMA = (() => {
 })();
 
 /** Schema-qualified table name for raw SQL (Prisma's own queries are qualified automatically). */
-export function table(name: "Order" | "RateLimit") {
+export function table(name: "Order" | "RateLimit" | "Product") {
   return Prisma.raw(`"${DB_SCHEMA}"."${name}"`);
 }
 

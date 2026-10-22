@@ -106,9 +106,10 @@ export async function sendOrderConfirmation(order: Order & { items: OrderItem[] 
   await sendMail(order.email, `Order confirmed — ${order.orderNumber}`, html);
 
   const store = await getSettings("store");
-  if (store.orders.notifyEmail) {
+  const ownerEmail = store.orders.notifyEmail || store.contactEmail;
+  if (ownerEmail) {
     await sendMail(
-      store.orders.notifyEmail,
+      ownerEmail,
       `New order ${order.orderNumber} — ${formatINR(order.total)}`,
       await layout(`New order ${order.orderNumber}`, `<p>${escapeHtml(order.shippingName)} placed an order.</p>${itemsTable(order)}${button(`${env.appUrl}/admin/orders/${order.id}`, "Open in admin")}`),
     );

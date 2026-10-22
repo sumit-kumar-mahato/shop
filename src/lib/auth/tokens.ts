@@ -10,8 +10,8 @@ export function hashToken(token: string): string {
 /** Create a single-use token (email verification / password reset). Only the hash is stored. */
 export async function createAuthToken(userId: string, type: TokenType, ttlMinutes: number): Promise<string> {
   const token = randomBytes(32).toString("base64url");
-  // Invalidate earlier unused tokens of the same type.
-  await prisma.authToken.deleteMany({ where: { userId, type, usedAt: null } });
+  // Invalidate earlier tokens of the same type, and purge anything expired.
+  await prisma.authToken.deleteMany({ where: { OR: [{ userId, type }, { expiresAt: { lt: new Date() } }] } });
   await prisma.authToken.create({
     data: {
       userId,

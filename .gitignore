@@ -43,3 +43,6 @@ Thumbs.db
 # Prisma / build
 /prisma/*.db
 .eslintcache
+
+# Database backups (contain customer data — never commit)
+/backups/

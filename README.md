@@ -85,6 +85,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 | `npm run db:migrate` | Apply database migrations |
 | `npm run db:seed` | Create admin + defaults (safe to run again — never overwrites your data) |
 | `npm run db:studio` | Browse the database in your browser |
+| `npm run db:backup` | Save a full copy of the store database to `backups/` (needs Docker; run it regularly — free database plans don't include backups) |
 
 ---
 
@@ -98,6 +99,14 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 3. Deploy. The `vercel-build` script automatically applies migrations, creates your admin account (first deploy only) and builds the site.
 
 > **Upgrading from the previous version:** the database design has changed completely (per-size stock, user accounts, order items, etc.), so use a **new, empty database** (a new Supabase project, or reset the old one). The old demo data is recreated by the seed. If you have real orders in the old database you want to keep, export them first.
+
+### Using an existing Supabase database
+Add `schema=store` to both URLs (e.g. `...?pgbouncer=true&schema=store`). The store then lives in its own `store` schema: existing tables are left untouched, and Supabase's automatic public API (which only exposes the `public` schema) can't reach customer data.
+
+### Before taking real orders
+The admin dashboard shows a **Launch checklist** until everything is done: real contact details, your own policies, replacing demo products, email (SMTP), Razorpay live keys, a strong webhook secret and `APP_URL`. Also:
+- **GST:** if you aren't GST-registered, set the GST rate to 0 and leave GSTIN empty in Store settings — invoices then won't show GST.
+- **Razorpay:** in Razorpay Dashboard → Account & Settings → Payment capture, make sure payments are **captured automatically**.
 
 ### Online payments (Razorpay)
 1. Create keys at <https://dashboard.razorpay.com/app/keys> and set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`.

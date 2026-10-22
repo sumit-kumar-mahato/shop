@@ -14,7 +14,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "vercel-build": "prisma generate && if [ \"$VERCEL_ENV\" = \"production\" ]; then tsx prisma/predeploy-check.ts && prisma migrate deploy && tsx prisma/seed.ts; fi && next build",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:backup": "node scripts/backup.mjs"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

@@ -74,6 +74,9 @@ export default function StoreSettingsEditor({ initial, integrations }: { initial
 
         <Panel title="Tax (GST)">
           <div className="space-y-4">
+            <p className="rounded-md bg-zinc-50 p-3 text-xs text-zinc-600 dark:bg-zinc-950 dark:text-zinc-400">
+              Not GST-registered? Set the rate to 0 and leave GSTIN empty — invoices will then not show GST.
+            </p>
             <Field label="GST rate (%)"><Input type="number" min={0} max={40} step="0.5" value={v.tax.ratePercent} onChange={(e) => set("tax", { ...v.tax, ratePercent: parseFloat(e.target.value) || 0 })} /></Field>
             <Checkbox
               label="My prices already include GST (recommended — standard for MRP pricing in India)"
@@ -102,7 +105,7 @@ export default function StoreSettingsEditor({ initial, integrations }: { initial
             <Field label="Low-stock alert at" hint="Variants at or below this stock appear on the dashboard">
               <Input type="number" min={0} value={v.orders.lowStockThreshold} onChange={(e) => set("orders", { ...v.orders, lowStockThreshold: parseInt(e.target.value, 10) || 0 })} />
             </Field>
-            <Field label="Send new-order alerts to" hint="Optional email address">
+            <Field label="Send new-order alerts to" hint="Leave empty to use the store contact email">
               <Input type="email" value={v.orders.notifyEmail} onChange={(e) => set("orders", { ...v.orders, notifyEmail: e.target.value })} />
             </Field>
             <Checkbox label="Customers must verify their email before ordering" checked={v.orders.requireEmailVerification} onChange={(e) => set("orders", { ...v.orders, requireEmailVerification: e.target.checked })} />

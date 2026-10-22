@@ -14,6 +14,10 @@ export async function rateLimit(key: string, limit: number, windowSeconds: numbe
       "resetAt" = CASE WHEN "RateLimit"."resetAt" < NOW() THEN NOW() + make_interval(secs => ${windowSeconds}) ELSE "RateLimit"."resetAt" END
     RETURNING "count", "resetAt"
   `;
+  // Occasionally purge expired rows so the table stays small.
+  if (Math.random() < 0.01) {
+    await prisma.rateLimit.deleteMany({ where: { resetAt: { lt: new Date() } } }).catch(() => undefined);
+  }
   const row = rows[0];
   const retryAfter = Math.max(1, Math.ceil((new Date(row.resetAt).getTime() - Date.now()) / 1000));
   return { ok: row.count <= limit, remaining: Math.max(0, limit - row.count), retryAfter };
