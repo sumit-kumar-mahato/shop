@@ -76,6 +76,11 @@ export default function Footer({ store, categories }: { store: StoreSettings; ca
         </div>
       </div>
 
+      <div className="container-page overflow-hidden" aria-hidden>
+        <p className="select-none whitespace-nowrap text-center font-display text-[13vw] font-bold leading-[0.85] tracking-tight text-luxury-100 dark:text-zinc-800/60 lg:text-[10.5vw]">
+          {store.logoText.split(" ")[0]}
+        </p>
+      </div>
       <div className="border-t border-luxury-100 dark:border-zinc-800">
         <div className="container-page flex flex-col items-center justify-between gap-3 py-5 text-xs text-luxury-500 sm:flex-row">
           <p>

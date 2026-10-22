@@ -35,7 +35,8 @@ export const viewport: Viewport = {
 };
 
 // Applies the saved light/dark preference before first paint to avoid a flash.
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}})()`;
+// Also marks that JavaScript is running, which enables scroll-reveal animations.
+const themeScript = `(function(){document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}})()`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [store, user] = await Promise.all([getSettings("store"), getCurrentUser()]);

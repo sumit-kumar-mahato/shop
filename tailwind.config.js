@@ -36,6 +36,15 @@ module.exports = {
         "slide-in-right": "slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) both",
         "slide-in-left": "slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) both",
         kenburns: "kenburns 30s ease-in-out infinite",
+        marquee: "marquee var(--marquee-duration, 40s) linear infinite",
+        shimmer: "shimmer 1.6s ease-in-out infinite",
+        "progress-fill": "progressFill var(--progress-duration, 6.5s) linear forwards",
+        rise: "rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "scroll-cue": "scrollCue 2s ease-in-out infinite",
+        pop: "pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both",
+        // "backwards" (not "both") so the finished animation doesn't leave a stacking context that would
+        // trap fixed-position pop-ups (quick view, lightbox, modals) beneath the header.
+        "page-in": "fadeIn 0.45s ease-out backwards",
       },
       keyframes: {
         fadeInUp: { "0%": { opacity: "0", transform: "translateY(16px)" }, "100%": { opacity: "1", transform: "none" } },
@@ -48,6 +57,16 @@ module.exports = {
           "0%, 100%": { transform: "scale(1.02)" },
           "50%": { transform: "scale(1.08) translate(0.5%, -0.5%)" },
         },
+        marquee: { "0%": { transform: "translateX(0)" }, "100%": { transform: "translateX(-50%)" } },
+        shimmer: { "0%": { backgroundPosition: "-200% 0" }, "100%": { backgroundPosition: "200% 0" } },
+        progressFill: { "0%": { transform: "scaleX(0)" }, "100%": { transform: "scaleX(1)" } },
+        rise: { "0%": { opacity: "0", transform: "translateY(110%)" }, "100%": { opacity: "1", transform: "none" } },
+        scrollCue: {
+          "0%": { transform: "translateY(0)", opacity: "0" },
+          "40%": { opacity: "1" },
+          "80%, 100%": { transform: "translateY(14px)", opacity: "0" },
+        },
+        pop: { "0%": { transform: "scale(1)" }, "50%": { transform: "scale(1.3)" }, "100%": { transform: "scale(1)" } },
       },
     },
   },

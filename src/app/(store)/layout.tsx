@@ -8,14 +8,18 @@ import CartDrawer from "@/components/store/CartDrawer";
 import BackToTop from "@/components/store/BackToTop";
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
-  const [store, categories] = await Promise.all([
+  const [store, home, categories] = await Promise.all([
     getSettings("store"),
+    getSettings("homepage"),
     prisma.category.findMany({
       where: { isActive: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      select: { name: true, slug: true, gender: true },
+      select: { name: true, slug: true, gender: true, image: true },
     }),
   ]);
+  // The header floats over the homepage hero only when the hero is the first visible section.
+  const firstSection = home.sections.find((s) => s.enabled);
+  const overlayOnHome = firstSection?.id === "hero" && home.banners.length > 0;
 
   return (
     <CartProvider>
@@ -27,6 +31,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           logoText={store.logoText}
           announcement={store.announcement.enabled && store.announcement.text ? store.announcement : null}
           categories={categories}
+          overlayOnHome={overlayOnHome}
         />
         <main id="main" className="min-h-[60vh]">
           {children}

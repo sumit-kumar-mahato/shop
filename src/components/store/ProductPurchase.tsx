@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Minus, Plus, RefreshCw, Ruler, Share2, ShoppingBag, Truck, Wallet } from "lucide-react";
+import { ArrowRight, Heart, Minus, Plus, RefreshCw, Ruler, Share2, ShoppingBag, Truck, Wallet } from "lucide-react";
 import { useCart } from "@/components/providers/CartProvider";
 import { useWishlist } from "@/components/providers/WishlistProvider";
 import { useToast } from "@/components/ui/Toast";
@@ -33,9 +34,12 @@ type Props = {
   variants: Variant[];
   sizeOrder: string[];
   delivery: { estimate: string; freeAbove: number; returnDays: number; cod: boolean; taxIncluded: boolean };
+  /** Slimmer layout used inside the Quick view panel. */
+  compact?: boolean;
+  onAdded?: () => void;
 };
 
-export default function ProductPurchase({ product, variants, sizeOrder, delivery }: Props) {
+export default function ProductPurchase({ product, variants, sizeOrder, delivery, compact, onAdded }: Props) {
   const router = useRouter();
   const { add, openDrawer } = useCart();
   const wishlist = useWishlist();
@@ -57,6 +61,17 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
   const [busy, setBusy] = useState<"add" | "buy" | null>(null);
   const [sizeError, setSizeError] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const addRef = useRef<HTMLDivElement>(null);
+  const sizesRef = useRef<HTMLDivElement>(null);
+
+  // On phones, show a pinned "Add to bag" bar once the main button scrolls out of view.
+  useEffect(() => {
+    if (compact || !addRef.current || !("IntersectionObserver" in window)) return;
+    const obs = new IntersectionObserver(([e]) => setShowStickyBar(!e.isIntersecting && e.boundingClientRect.top < 0), { threshold: 0 });
+    obs.observe(addRef.current);
+    return () => obs.disconnect();
+  }, [compact]);
 
   const sizesForColor = sizeOrder
     .map((s) => variants.find((v) => v.size === s && v.color === color))
@@ -72,6 +87,7 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
   const purchase = async (mode: "add" | "buy") => {
     if (!selected) {
       setSizeError(true);
+      sizesRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     setBusy(mode);
@@ -81,6 +97,7 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
       toast(res.message ?? "Could not add to bag", "error");
       return;
     }
+    onAdded?.();
     if (mode === "buy") router.push("/checkout");
     else openDrawer();
   };
@@ -98,11 +115,13 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
     }
   };
 
+  const Title = compact ? "h2" : "h1";
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         {product.categoryName && <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">{product.categoryName}</p>}
-        <h1 className="font-serif text-3xl leading-snug sm:text-4xl">{product.title}</h1>
+        <Title className={cn("font-serif leading-tight", compact ? "text-2xl sm:text-3xl" : "text-3xl sm:text-5xl")}>{product.title}</Title>
         {product.ratingCount > 0 && (
           <a href="#reviews" className="inline-flex items-center gap-2 text-sm text-luxury-600 hover:underline dark:text-zinc-400">
             <Stars rating={product.ratingAvg} /> {product.ratingAvg.toFixed(1)} · {product.ratingCount} {product.ratingCount === 1 ? "review" : "reviews"}
@@ -152,7 +171,7 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
       )}
 
       {!singleSize && (
-        <div>
+        <div ref={sizesRef} className="scroll-mt-32">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm">
               <span className="font-semibold">Size:</span> <span className="text-luxury-600 dark:text-zinc-400">{size ?? "Select a size"}</span>
@@ -200,7 +219,7 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
         ) : null}
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div ref={addRef} className="flex flex-wrap gap-3">
         <div className="flex h-12 items-center rounded-sm border border-luxury-300 dark:border-zinc-700">
           <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} disabled={quantity <= 1} className="flex h-full w-11 items-center justify-center disabled:opacity-40" aria-label="Decrease quantity">
             <Minus size={16} />
@@ -226,6 +245,12 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
         Buy it now
       </Button>
 
+      {compact ? (
+        <Link href={`/product/${product.slug}`} className="group inline-flex items-center gap-1 text-sm font-semibold underline-offset-4 hover:underline">
+          View full details <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+        </Link>
+      ) : (
+      <>
       <ul className="grid gap-3 rounded-sm bg-luxury-100/70 p-4 text-sm dark:bg-zinc-900">
         <li className="flex gap-3">
           <Truck size={18} className="flex-shrink-0 text-brand" />
@@ -265,6 +290,32 @@ export default function ProductPurchase({ product, variants, sizeOrder, delivery
       <button onClick={share} className="flex items-center gap-2 text-sm text-luxury-600 hover:text-luxury-900 dark:text-zinc-400 dark:hover:text-white">
         <Share2 size={16} /> Share this product
       </button>
+      </>
+      )}
+
+      {/* Pinned buy bar on phones */}
+      {!compact && totalStock > 0 && (
+        <div
+          className={cn(
+            "fixed inset-x-0 bottom-0 z-30 border-t border-luxury-200 bg-white/95 p-3 backdrop-blur transition-transform duration-300 dark:border-zinc-800 dark:bg-zinc-950/95 lg:hidden",
+            showStickyBar ? "translate-y-0" : "translate-y-full",
+          )}
+          aria-hidden={!showStickyBar}
+        >
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{product.title}</p>
+              <p className="text-sm font-semibold">
+                {formatINR(price)}
+                {size && <span className="ml-2 font-normal text-luxury-500">{color} · {size}</span>}
+              </p>
+            </div>
+            <Button onClick={() => purchase("add")} loading={busy === "add"} disabled={selected ? selected.stock <= 0 : false} tabIndex={showStickyBar ? 0 : -1}>
+              <ShoppingBag size={16} /> {selected ? "Add to bag" : "Select size"}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Modal open={guideOpen} onClose={() => setGuideOpen(false)} title="Size guide">
         <p className="mb-4 text-sm text-luxury-600 dark:text-zinc-400">Measurements are body measurements in inches. If you are between sizes, choose the larger size for a relaxed fit.</p>

@@ -76,7 +76,7 @@ type DemoProduct = {
 };
 
 const CATEGORIES: Array<{ name: string; gender: Gender | null; image: string; description: string }> = [
-  { name: "Shirts", gender: "MEN", image: img("1621072156002-e2fcc103e86e"), description: "Linen, cotton and Oxford shirts for work and weekends." },
+  { name: "Shirts", gender: "MEN", image: img("1602810318383-e386cc2a3ccf"), description: "Linen, cotton and Oxford shirts for work and weekends." },
   { name: "Sarees", gender: "WOMEN", image: img("1610030469983-98e550d6193c"), description: "Handwoven Banarasi, Kanjeevaram and everyday sarees." },
   { name: "Ethnic Wear", gender: "WOMEN", image: img("1608748010899-18f300247112"), description: "Anarkalis, kurtas and festive sets." },
   { name: "Jeans", gender: "UNISEX", image: img("1542272604-787c3835535d"), description: "Denim in every fit." },
@@ -91,7 +91,7 @@ const PRODUCTS: DemoProduct[] = [
     title: "Classic White Linen Shirt",
     description: "Crafted from 100% fine French linen, this shirt is breathable, light and perfect for smart-casual wear.\n\nModern slim fit with a point collar and single-button cuffs.",
     price: 2499, compareAtPrice: 3999, category: "Shirts", gender: "MEN",
-    images: [img("1621072156002-e2fcc103e86e"), img("1603252109303-2751441dd157")],
+    images: [img("1598033129183-c4f50c736f10"), img("1603252109303-2751441dd157")],
     fabric: "100% Linen", fit: "Slim fit", care: "Machine wash cold, line dry, warm iron.",
     tags: ["linen", "summer", "formal", "white"], sizes: ["S", "M", "L", "XL"], colors: [["White", "#FFFFFF"], ["Sky Blue", "#BFDBFE"]], stock: 12,
     flags: { isFeatured: true, isTrending: true, isNewArrival: true },

@@ -28,7 +28,7 @@
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
   .glass {
-    @apply bg-white/80 backdrop-blur-md dark:bg-zinc-950/80;
+    @apply bg-white/90 backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-950/85;
   }
   .prose-store p {
     @apply mb-4 leading-relaxed text-luxury-700 dark:text-zinc-300;
@@ -36,6 +36,36 @@
   .prose-store h2 {
     @apply mb-3 mt-8 font-serif text-2xl text-luxury-900 first:mt-0 dark:text-white;
   }
+}
+
+/* Scroll-reveal (see components/ui/Reveal.tsx). Content stays visible if JavaScript is off. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Loading shimmer for images and skeletons */
+.shimmer {
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.04) 25%, rgb(0 0 0 / 0.09) 37%, rgb(0 0 0 / 0.04) 63%);
+  background-size: 400% 100%;
+}
+.dark .shimmer {
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.04) 25%, rgb(255 255 255 / 0.09) 37%, rgb(255 255 255 / 0.04) 63%);
+  background-size: 400% 100%;
+}
+
+/* Edge fade for horizontal carousels and marquees */
+.mask-fade-x {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
 }
 
 /* Thin scrollbars */

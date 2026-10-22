@@ -12,10 +12,12 @@ export const POST = route(
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    const event = JSON.parse(raw) as {
-      event: string;
-      payload?: { payment?: { entity?: { id: string; order_id: string; error_description?: string } } };
-    };
+    let event: { event: string; payload?: { payment?: { entity?: { id: string; order_id: string; error_description?: string } } } };
+    try {
+      event = JSON.parse(raw);
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
     const payment = event.payload?.payment?.entity;
 
     if (payment?.order_id) {

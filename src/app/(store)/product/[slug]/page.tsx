@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import type { Gender } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getSettings } from "@/lib/settings";
 import { getProductCards, sortSizes } from "@/lib/catalog";
-import { ProductGrid } from "@/components/store/ProductCard";
+import ProductRail from "@/components/store/ProductRail";
+import RecentlyViewed from "@/components/store/RecentlyViewed";
 import ProductGallery from "@/components/store/ProductGallery";
 import ProductPurchase from "@/components/store/ProductPurchase";
 import ProductReviews from "@/components/store/ProductReviews";
-import { SectionHeading } from "@/components/ui/Misc";
 
 type Props = { params: { slug: string } };
 
@@ -22,6 +23,17 @@ async function loadProduct(slug: string) {
       variants: { where: { isActive: true }, orderBy: { position: "asc" } },
     },
   });
+}
+
+/** Same-category products first, topped up with others for the same audience. */
+async function relatedProducts(productId: string, categoryId: string | null, gender: Gender) {
+  const sameCategory = categoryId ? await getProductCards({ id: { not: productId }, categoryId }, { take: 8 }) : [];
+  if (sameCategory.length >= 8) return sameCategory;
+  const more = await getProductCards(
+    { id: { notIn: [productId, ...sameCategory.map((p) => p.id)] }, gender: { in: [gender, "UNISEX"] } },
+    { take: 8 - sameCategory.length, orderBy: [{ salesCount: "desc" }] },
+  );
+  return [...sameCategory, ...more];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -57,7 +69,7 @@ export default async function ProductPage({ params }: Props) {
       include: { user: { select: { name: true } } },
     }),
     user ? prisma.review.findUnique({ where: { productId_userId: { productId: product.id, userId: user.id } }, select: { status: true } }) : null,
-    getProductCards({ id: { not: product.id }, ...(product.categoryId ? { categoryId: product.categoryId } : { gender: product.gender }) }, { take: 4 }),
+    relatedProducts(product.id, product.categoryId, product.gender),
   ]);
 
   const variants = product.variants.map((v) => ({
@@ -112,8 +124,11 @@ export default async function ProductPage({ params }: Props) {
         <span className="line-clamp-1 text-luxury-800 dark:text-zinc-300">{product.title}</span>
       </nav>
 
-      <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-        <ProductGallery images={product.images} title={product.title} />
+      <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
+        <div className="self-start">
+          <ProductGallery images={product.images} title={product.title} />
+        </div>
+        <div className="lg:sticky lg:top-28 lg:self-start">
         <ProductPurchase
           product={{
             id: product.id,
@@ -139,6 +154,7 @@ export default async function ProductPage({ params }: Props) {
             taxIncluded: store.tax.pricesIncludeTax,
           }}
         />
+        </div>
       </div>
 
       <ProductReviews
@@ -160,11 +176,13 @@ export default async function ProductPage({ params }: Props) {
       />
 
       {related.length > 0 && (
-        <section className="mt-20 border-t border-luxury-200 pt-16 dark:border-zinc-800">
-          <SectionHeading eyebrow="You may also like" title="Complete the Look" />
-          <ProductGrid products={related} />
-        </section>
+        <div className="-mx-4 mt-24 border-t border-luxury-200 pt-20 dark:border-zinc-800 sm:-mx-6 lg:-mx-8">
+          <ProductRail eyebrow="You may also like" title="Complete the Look" products={related} href={product.category ? `/shop?category=${product.category.slug}` : "/shop"} />
+        </div>
       )}
+      <div className="-mx-4 sm:-mx-6 lg:-mx-8">
+        <RecentlyViewed currentSlug={product.slug} />
+      </div>
     </div>
   );
 }

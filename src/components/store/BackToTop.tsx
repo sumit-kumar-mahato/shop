@@ -22,7 +22,7 @@ export default function BackToTop() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="no-print fixed bottom-5 right-5 z-30 flex h-12 w-12 animate-fade-in items-center justify-center rounded-full bg-white shadow-lg dark:bg-zinc-900"
+      className="no-print fixed bottom-5 right-5 z-20 hidden h-12 w-12 animate-fade-in items-center justify-center rounded-full bg-white shadow-lg dark:bg-zinc-900 sm:flex"
       aria-label="Back to top"
     >
       <svg className="absolute inset-0 -rotate-90" viewBox="0 0 48 48" aria-hidden>
