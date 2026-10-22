@@ -120,6 +120,30 @@ Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` and `MAIL_FROM` (any 
 
 ---
 
+## Releasing changes (automatic)
+
+**Push code to the `dev` branch — never directly to `main`.** The *Test & release* workflow (`.github/workflows/ci.yml`) then:
+
+1. Checks the change: type check, lint, unit tests, database migrations on a fresh database, a production build, and ~155 end-to-end checks against a real running store (`tests/e2e/`).
+2. **All green →** moves `main` to the tested commit. Vercel deploys `main` to production (it also applies new database migrations).
+3. Waits until the live site serves the new version (`/api/health`), smoke-tests it, and notifies search engines through IndexNow.
+
+**Anything red →** `main` is not touched, so the live website keeps running the last good version. A GitHub issue labelled `website-alert` is opened and @mentions you (GitHub emails you); it closes itself after the next successful release. Progress is visible under the repository's **Actions** tab.
+
+Pushes straight to `main` (for example an edit on github.com) are deployed by Vercel immediately and checked afterwards — you're alerted if they're broken. To roll back: Vercel → Deployments → the previous deployment → **Promote**.
+
+Content edited in the **admin panel** (products, homepage, settings…) is live instantly and needs no release. The sitemap updates itself, and the daily maintenance job reports changed pages to search engines.
+
+Run the end-to-end checks locally with the store running on port 3100 and the docker database: `npm run test:e2e`. They refuse to run against any non-local address.
+
+### Search engines
+- **Google** reads `/sitemap.xml` (submitted once in Google Search Console) and re-checks it by itself; product, category and article dates tell it what changed.
+- **Bing, Yahoo, DuckDuckGo, Yandex** are notified within minutes through IndexNow (key served at `/indexnow.txt`, override with `INDEXNOW_KEY`).
+- Verification codes for Google Search Console / Bing go in **Admin → Store settings → Search engines**.
+- Moving to a new address: set `APP_URL` to it and add the old host to `LEGACY_HOSTS`. Old pages then redirect permanently, while `/api` routes such as payment webhooks keep working. Also update `SITE_URL` in `.github/workflows/ci.yml`.
+
+---
+
 ## Project structure
 
 ```

@@ -1,0 +1,226 @@
+# Safe automatic releases.
+#
+#   push to `dev` ──► 1. checks: types, lint, unit tests, database migrations on a fresh database,
+#                        production build, and ~155 end-to-end checks against a real running store
+#                    2. all green ► `main` is fast-forwarded to the tested commit ► Vercel deploys it
+#                    3. waits until the live site serves the new version, then smoke-tests it and
+#                       tells search engines (IndexNow) that the pages changed
+#   anything red ──► `main` is not touched (the live site keeps running the last good version) and a
+#                    GitHub issue is opened that @mentions the owner, so GitHub emails you. The issue
+#                    closes itself after the next successful release.
+#
+# A push straight to `main` (e.g. an edit on github.com) is deployed by Vercel immediately, so it is
+# checked afterwards and you are alerted if it is broken.
+
+name: Test & release
+
+on:
+  push:
+    branches: [dev, main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # fast-forward main after the checks pass
+  issues: write # open / close alert issues
+
+env:
+  # The live website. Change this if you move to a new domain.
+  SITE_URL: https://prabodhkumarmahato.vercel.app
+  NODE_VERSION: "22"
+
+jobs:
+  test:
+    name: Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pkm_shop
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pkm_shop?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/pkm_shop?schema=public
+      PSQL_URL: postgresql://postgres:postgres@localhost:5432/pkm_shop
+      APP_URL: http://localhost:3100
+      ADMIN_EMAIL: admin@localhost.test
+      ADMIN_PASSWORD: LocalAdmin@2026
+      ADMIN_NAME: Store Owner
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Throwaway secrets for the test server
+        run: echo "AUTH_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Database migrations on a fresh database
+        run: npx prisma migrate deploy
+
+      - name: Seed (admin account, settings, demo catalogue)
+        run: npm run db:seed
+
+      - name: Production build (includes lint)
+        run: npm run build
+
+      - name: Start the store
+        run: |
+          npx next start -p 3100 > server.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fs -o /dev/null http://localhost:3100/api/health; then echo "Store is up"; exit 0; fi
+            sleep 2
+          done
+          echo "The store did not start"; cat server.log; exit 1
+
+      - name: End-to-end checks — shopping, checkout, orders, admin, security
+        run: bash tests/e2e/store.sh
+
+      - name: End-to-end checks — website builder, live preview, bulk actions
+        run: |
+          psql "$PSQL_URL" -c 'DELETE FROM "RateLimit"' > /dev/null
+          bash tests/e2e/builder.sh
+
+      - name: No server errors during the checks
+        run: |
+          if grep -E "⨯|Unhandled|PrismaClient.*Error|TypeError|ReferenceError" server.log; then
+            echo "::error::The server logged errors during the checks (see above)"; exit 1
+          fi
+
+      - name: Server log
+        if: failure()
+        run: tail -n 200 server.log || true
+
+  release:
+    name: Release to the live site
+    needs: test
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fast-forward main to the tested commit (Vercel deploys main automatically)
+        run: git push origin "${GITHUB_SHA}:refs/heads/main"
+
+  live:
+    name: Verify the live site
+    needs: [test, release]
+    if: >-
+      always() &&
+      ((github.ref == 'refs/heads/dev' && needs.release.result == 'success') || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Wait for Vercel to put this version live
+        run: |
+          for i in $(seq 1 90); do
+            commit=$(curl -fs "$SITE_URL/api/health" | sed -n 's/.*"commit":"\([0-9a-f]*\)".*/\1/p' || true)
+            if [ "$commit" = "$GITHUB_SHA" ]; then echo "Live after ~$((i * 10))s"; exit 0; fi
+            sleep 10
+          done
+          echo "::error::The new version did not go live within 15 minutes. Vercel's build probably failed — the previous version is still serving visitors."
+          exit 1
+
+      - name: Smoke-test the live site
+        run: |
+          fail=0
+          expect() { got=$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL$2"); if [ "$got" = "$1" ]; then echo "ok   $2 → $got"; else echo "FAIL $2 → $got (expected $1)"; fail=1; fi; }
+          product=$(curl -s "$SITE_URL/sitemap.xml" | grep -o '/product/[^<]*' | head -1)
+          expect 200 /
+          expect 200 /shop
+          expect 200 /offers
+          expect 200 /about
+          [ -n "$product" ] && expect 200 "$product"
+          expect 404 /product/this-product-does-not-exist
+          expect 307 /admin
+          expect 200 /sitemap.xml
+          expect 200 /robots.txt
+          expect 200 /api/health
+          exit $fail
+
+      - name: Tell search engines about the update (IndexNow)
+        continue-on-error: true
+        run: |
+          key=$(curl -fs "$SITE_URL/indexnow.txt")
+          host=$(echo "$SITE_URL" | sed 's#https://##')
+          urls=$(curl -fs "$SITE_URL/sitemap.xml" | grep -o '<loc>[^<]*</loc>' | sed 's#</\?loc>##g' | sed 's/&amp;/\&/g' | head -1000 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.stringify(s.trim().split("\n"))))')
+          curl -s -o /dev/null -w 'IndexNow: %{http_code}\n' -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d "{\"host\":\"$host\",\"key\":\"$key\",\"keyLocation\":\"$SITE_URL/indexnow.txt\",\"urlList\":$urls}"
+
+  notify:
+    name: Notify
+    needs: [test, release, live]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          TEST: ${{ needs.test.result }}
+          RELEASE: ${{ needs.release.result }}
+          LIVE: ${{ needs.live.result }}
+        with:
+          script: |
+            const { TEST, RELEASE, LIVE, SITE_URL } = process.env;
+            const branch = context.ref.replace("refs/heads/", "");
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const sha = context.sha.slice(0, 7);
+            const message = (context.payload.head_commit?.message ?? "").split("\n")[0];
+            const label = "website-alert";
+            const owner = context.repo.owner;
+
+            const open = await github.paginate(github.rest.issues.listForRepo, { ...context.repo, state: "open", labels: label });
+
+            let problem = null;
+            if (TEST === "failure") {
+              problem = branch === "dev"
+                ? "**Your latest change was NOT published.** The automatic checks found a problem, so the live website was left untouched and is still running the last good version."
+                : "**A change pushed straight to `main` failed the automatic checks.** Vercel publishes `main` immediately, so the broken version may be live. Roll back in Vercel → Deployments → previous deployment → Promote, then fix and push to `dev`.";
+            } else if (RELEASE === "failure") {
+              problem = "**The tested change could not be published** because `main` contains commits that are not in `dev`. Merge `main` into `dev` and push again. The live website is unchanged.";
+            } else if (LIVE === "failure") {
+              problem = `**The change passed all checks but the live site did not come up correctly** (${SITE_URL}). If Vercel's build failed, the previous version is still live — see Vercel → Deployments for the error. If the smoke test failed, roll back in Vercel → Deployments → previous deployment → Promote.`;
+            }
+
+            if (problem) {
+              const body = `@${owner} ${problem}\n\n- Change: \`${sha}\` ${message}\n- Branch: \`${branch}\`\n- Details: ${run}\n\nThis issue closes automatically after the next successful release.`;
+              try { await github.rest.issues.createLabel({ ...context.repo, name: label, color: "d73a4a", description: "Automatic release problem" }); } catch {}
+              if (open.length) {
+                await github.rest.issues.createComment({ ...context.repo, issue_number: open[0].number, body });
+              } else {
+                await github.rest.issues.create({ ...context.repo, title: `🚨 Website update problem (${sha})`, body, labels: [label] });
+              }
+              core.setFailed("Release problem reported in an issue.");
+              return;
+            }
+
+            const released = (branch === "dev" && RELEASE === "success" && LIVE === "success") || (branch === "main" && TEST === "success" && LIVE === "success");
+            if (released) {
+              for (const issue of open) {
+                await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body: `✅ Fixed — \`${sha}\` passed all checks and is live on ${SITE_URL}.` });
+                await github.rest.issues.update({ ...context.repo, issue_number: issue.number, state: "closed" });
+              }
+              core.notice(`Live on ${SITE_URL}`);
+            }

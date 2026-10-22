@@ -46,3 +46,6 @@ Thumbs.db
 
 # Database backups (contain customer data — never commit)
 /backups/
+
+# end-to-end test scratch files
+/.e2e-tmp/

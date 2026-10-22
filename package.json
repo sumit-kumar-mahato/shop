@@ -15,7 +15,8 @@
     "db:studio": "prisma studio",
     "vercel-build": "prisma generate && if [ \"$VERCEL_ENV\" = \"production\" ]; then tsx prisma/predeploy-check.ts && prisma migrate deploy && tsx prisma/seed.ts; fi && next build",
     "postinstall": "prisma generate",
-    "db:backup": "node scripts/backup.mjs"
+    "db:backup": "node scripts/backup.mjs",
+    "test:e2e": "bash tests/e2e/store.sh && bash tests/e2e/builder.sh"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
