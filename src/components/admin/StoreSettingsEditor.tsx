@@ -115,6 +115,14 @@ export default function StoreSettingsEditor({ initial, integrations }: { initial
           <div className="space-y-4">
             <Field label="Homepage title"><Input value={v.seo.title} onChange={(e) => set("seo", { ...v.seo, title: e.target.value })} maxLength={120} /></Field>
             <Field label="Homepage description"><Textarea rows={2} value={v.seo.description} onChange={(e) => set("seo", { ...v.seo, description: e.target.value })} maxLength={300} /></Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Google Search Console code" hint="From Search Console → Add property → HTML tag. Paste the code or the whole tag.">
+                <Input value={v.seo.googleVerification} onChange={(e) => set("seo", { ...v.seo, googleVerification: e.target.value })} placeholder="e.g. AbC123…" className="font-mono" />
+              </Field>
+              <Field label="Bing Webmaster code (optional)" hint="Also covers Yahoo and DuckDuckGo.">
+                <Input value={v.seo.bingVerification} onChange={(e) => set("seo", { ...v.seo, bingVerification: e.target.value })} className="font-mono" />
+              </Field>
+            </div>
           </div>
         </Panel>
       </div>

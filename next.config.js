@@ -27,6 +27,21 @@ const securityHeaders = [
   ...(isDev ? [] : [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }]),
 ];
 
+// Old web addresses (comma-separated hosts) whose pages permanently redirect to APP_URL, so search
+// engines index a single address. API routes are not redirected, so payment webhooks set up with an
+// old address keep working.
+const appHost = (() => {
+  try {
+    return new URL(process.env.APP_URL || "").host;
+  } catch {
+    return "";
+  }
+})();
+const legacyHosts = (process.env.LEGACY_HOSTS || "")
+  .split(",")
+  .map((h) => h.trim().toLowerCase())
+  .filter((h) => h && h !== appHost);
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -46,6 +61,12 @@ const nextConfig = {
       { source: "/admin/login", destination: "/login?next=/admin", permanent: false },
       { source: "/admin/content", destination: "/admin/homepage", permanent: true },
       { source: "/policy", destination: "/policies/shipping", permanent: true },
+      ...legacyHosts.map((host) => ({
+        source: "/:path((?!api/).*)",
+        has: [{ type: "host", value: host }],
+        destination: `https://${appHost}/:path`,
+        permanent: true,
+      })),
     ];
   },
 };

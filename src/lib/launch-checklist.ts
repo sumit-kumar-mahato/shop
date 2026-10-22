@@ -65,5 +65,11 @@ export async function getLaunchChecklist(): Promise<ChecklistItem[]> {
       title: "Set APP_URL to your website address",
       detail: "Links in emails and the sitemap use APP_URL. It must be your https:// address.",
     },
+    {
+      done: Boolean(store.seo.googleVerification),
+      title: "Register your store with Google",
+      detail: `In Google Search Console add the property ${env.appUrl}, choose “HTML tag”, paste the code under Store settings → Search engines, press Verify, then submit ${env.appUrl}/sitemap.xml.`,
+      href: "/admin/settings",
+    },
   ];
 }

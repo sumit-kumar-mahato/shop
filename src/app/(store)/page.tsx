@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { ArrowRight, ArrowUpRight, Quote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { getProductCards } from "@/lib/catalog";
+import { env } from "@/lib/env";
 import { activeBanners } from "@/lib/homepage";
 import { GENDER_LABELS } from "@/lib/constants";
 import { formatINR } from "@/lib/money";
@@ -32,6 +34,37 @@ import SmartImage from "@/components/ui/SmartImage";
 import ParallaxImage from "@/components/ui/ParallaxImage";
 import Icon from "@/components/ui/Icon";
 import { Stars } from "@/components/ui/Misc";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
+/** Structured data that helps Google show the shop's name, logo, contact details and a search box. */
+async function storeJsonLd() {
+  const [store, theme] = await Promise.all([getSettings("store"), getSettings("theme")]);
+  const url = env.appUrl;
+  const logo = theme.logo.image ? new URL(theme.logo.image, url).toString() : undefined;
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: store.storeName,
+      url,
+      potentialAction: { "@type": "SearchAction", target: `${url}/shop?q={search_term_string}`, "query-input": "required name=search_term_string" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ClothingStore",
+      name: store.storeName,
+      url,
+      ...(logo ? { logo, image: logo } : {}),
+      description: store.seo.description || store.tagline,
+      email: store.contactEmail,
+      ...(store.contactPhone ? { telephone: store.contactPhone } : {}),
+      ...(store.address ? { address: { "@type": "PostalAddress", streetAddress: store.address, addressCountry: "IN" } } : {}),
+      // Only real profile links (not a bare https://instagram.com placeholder).
+      sameAs: Object.values(store.social).filter((s) => /^https:\/\/[^/]+\/[^/]+/.test(s)),
+    },
+  ];
+}
 
 /** Products for a "Product collection" block. */
 function loadBlockProducts(block: BlockOf<"products">): Promise<ProductCardData[]> {
@@ -81,6 +114,7 @@ export default async function HomePage() {
     Promise.all(productBlocks.map(async (b) => [b.id, await loadBlockProducts(b)] as const)).then((e) => new Map(e)),
   ]);
   const text = home.sectionText;
+  const jsonLd = await storeJsonLd();
 
   const renderBlock = (block: HomepageBlock) => {
     switch (block.type) {
@@ -331,8 +365,11 @@ export default async function HomePage() {
   };
 
   return (
-    <div className={cn("space-y-24 pb-8 sm:space-y-32", !heroFirst && "pt-10")}>
-      {enabled.map((s, i) => render(s.id, i))}
-    </div>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <div className={cn("space-y-24 pb-8 sm:space-y-32", !heroFirst && "pt-10")}>
+        {enabled.map((s, i) => render(s.id, i))}
+      </div>
+    </>
   );
 }

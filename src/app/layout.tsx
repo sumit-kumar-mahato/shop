@@ -36,6 +36,10 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: { type: "website", siteName: store.storeName, title: store.seo.title, description: store.seo.description, locale: "en_IN" },
     twitter: { card: "summary_large_image" },
     icons: { icon: theme.favicon || "/favicon.ico" },
+    verification: {
+      ...(store.seo.googleVerification ? { google: store.seo.googleVerification } : {}),
+      ...(store.seo.bingVerification ? { other: { "msvalidate.01": store.seo.bingVerification } } : {}),
+    },
   };
 }
 

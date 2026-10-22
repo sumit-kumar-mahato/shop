@@ -21,6 +21,14 @@ const imageUrl = z
   });
 
 const text = (max: number) => z.string().trim().max(max);
+
+/** Search-engine ownership code. Accepts the bare code or the whole <meta … content="…"> tag. */
+const verificationCode = z
+  .string()
+  .trim()
+  .max(300)
+  .transform((v) => v.match(/content=["']([^"']+)["']/i)?.[1] ?? v)
+  .refine((v) => /^[A-Za-z0-9_-]{0,100}$/.test(v), "Paste the code (or the whole meta tag) from the search engine");
 const money = z.number().int().min(0).max(100_000_000); // paise
 const keysOf = <T extends Record<string, unknown>>(o: T) => Object.keys(o) as [keyof T & string, ...Array<keyof T & string>];
 
@@ -50,6 +58,8 @@ export const storeSettingsSchema = z.object({
   seo: z.object({
     title: text(120),
     description: text(300),
+    googleVerification: verificationCode.default(""),
+    bingVerification: verificationCode.default(""),
   }),
   announcement: z.object({
     enabled: z.boolean(),
@@ -93,6 +103,8 @@ export const defaultStoreSettings: StoreSettings = {
   seo: {
     title: "Prabodh Kumar Mahato | Premium Clothing Store",
     description: "Shop premium linens, Banarasi silk sarees, ethnic wear, denim and everyday essentials with fast delivery across India.",
+    googleVerification: "",
+    bingVerification: "",
   },
   announcement: { enabled: true, text: "Free shipping on orders above ₹1,999 · Easy 7-day returns", link: "/shop" },
   shipping: { flatFee: 9900, freeShippingThreshold: 199900, estimatedDelivery: "3–7 business days" },
