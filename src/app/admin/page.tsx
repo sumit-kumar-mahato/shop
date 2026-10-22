@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AlertTriangle, IndianRupee, Package, ShoppingCart, Users } from "lucide-react";
-import { prisma } from "@/lib/db";
+import { prisma, table } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { expireStalePendingOrders } from "@/lib/orders";
 import { ORDER_STATUS_LABELS, REVENUE_STATUSES } from "@/lib/constants";
@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
     }),
     prisma.$queryRaw<Array<{ day: Date; revenue: bigint; orders: bigint }>>`
       SELECT date_trunc('day', "createdAt") AS day, COALESCE(SUM("total"), 0) AS revenue, COUNT(*) AS orders
-      FROM "Order"
+      FROM ${table("Order")}
       WHERE "createdAt" >= ${since30}
         AND "status"::text IN ('CONFIRMED','PROCESSING','SHIPPED','OUT_FOR_DELIVERY','DELIVERED','RETURN_REQUESTED')
       GROUP BY 1 ORDER BY 1`,

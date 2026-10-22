@@ -4,13 +4,15 @@
  * tables have the same names but a different structure. Point the deploy at a new, empty database.
  */
 import { PrismaClient } from "@prisma/client";
+import { DB_SCHEMA } from "../src/lib/db";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log(`Using database schema "${DB_SCHEMA}".`);
   const rows = await prisma.$queryRaw<Array<{ table_name: string }>>`
     SELECT table_name FROM information_schema.tables
-    WHERE table_schema = current_schema() AND table_name IN ('_prisma_migrations', 'Product', 'CmsConfig')`;
+    WHERE table_schema = ${DB_SCHEMA} AND table_name IN ('_prisma_migrations', 'Product', 'CmsConfig')`;
   const tables = new Set(rows.map((r) => r.table_name));
   if (!tables.has("_prisma_migrations") && (tables.has("Product") || tables.has("CmsConfig"))) {
     console.error(

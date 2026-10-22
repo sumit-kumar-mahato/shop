@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { prisma, table } from "@/lib/db";
 
 /**
  * Fixed-window rate limiter stored in Postgres, so limits hold across serverless instances.
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
  */
 export async function rateLimit(key: string, limit: number, windowSeconds: number) {
   const rows = await prisma.$queryRaw<Array<{ count: number; resetAt: Date }>>`
-    INSERT INTO "RateLimit" ("key", "count", "resetAt")
+    INSERT INTO ${table("RateLimit")} ("key", "count", "resetAt")
     VALUES (${key}, 1, NOW() + make_interval(secs => ${windowSeconds}))
     ON CONFLICT ("key") DO UPDATE SET
       "count" = CASE WHEN "RateLimit"."resetAt" < NOW() THEN 1 ELSE "RateLimit"."count" + 1 END,
