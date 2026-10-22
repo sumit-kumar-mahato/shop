@@ -39,3 +39,7 @@ next-env.d.ts
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Prisma / build
+/prisma/*.db
+.eslintcache

@@ -1,58 +1,55 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{ts,tsx}"],
   darkMode: "class",
   theme: {
     extend: {
       colors: {
+        // Brand accent is driven by the "Primary color" store setting (see app/layout.tsx).
+        brand: {
+          DEFAULT: "rgb(var(--brand-rgb) / <alpha-value>)",
+          fg: "rgb(var(--brand-fg-rgb) / <alpha-value>)",
+        },
         luxury: {
-          50: "#faf9f6",    // Off-white linen
+          50: "#faf9f6",
           100: "#f5f4ef",
           200: "#e6e3d8",
           300: "#d1cbba",
           400: "#b3aa94",
-          500: "#948a73",   // Luxury taupe
+          500: "#948a73",
           600: "#756d59",
           700: "#575143",
-          800: "#3d382e",   // Charcoal bronze
-          900: "#1f1c17",   // Warm black
-          gold: "#c5a880",  // Premium brand gold accent
+          800: "#3d382e",
+          900: "#1f1c17",
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "Inter", "sans-serif"],
-        serif: ["Playfair Display", "Georgia", "serif"],
-        display: ["Outfit", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
       },
       animation: {
-        "fade-in-up": "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "fade-in": "fadeIn 0.4s ease-out forwards",
-        "scale-in": "scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "slide-down": "slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-in-up": "fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "fade-in": "fadeIn 0.3s ease-out both",
+        "scale-in": "scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "slide-down": "slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "slide-in-right": "slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "slide-in-left": "slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) both",
+        kenburns: "kenburns 30s ease-in-out infinite",
       },
       keyframes: {
-        fadeInUp: {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        fadeIn: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
-        scaleIn: {
-          "0%": { opacity: "0", transform: "scale(0.95)" },
-          "100%": { opacity: "1", transform: "scale(1)" },
-        },
-        slideDown: {
-          "0%": { opacity: "0", transform: "translateY(-10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+        fadeInUp: { "0%": { opacity: "0", transform: "translateY(16px)" }, "100%": { opacity: "1", transform: "none" } },
+        fadeIn: { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
+        scaleIn: { "0%": { opacity: "0", transform: "scale(0.96)" }, "100%": { opacity: "1", transform: "none" } },
+        slideDown: { "0%": { opacity: "0", transform: "translateY(-8px)" }, "100%": { opacity: "1", transform: "none" } },
+        slideInRight: { "0%": { transform: "translateX(100%)" }, "100%": { transform: "none" } },
+        slideInLeft: { "0%": { transform: "translateX(-100%)" }, "100%": { transform: "none" } },
+        kenburns: {
+          "0%, 100%": { transform: "scale(1.02)" },
+          "50%": { transform: "scale(1.08) translate(0.5%, -0.5%)" },
         },
       },
     },
   },
   plugins: [],
-}
+};

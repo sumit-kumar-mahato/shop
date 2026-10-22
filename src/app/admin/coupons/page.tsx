@@ -1,18 +1,23 @@
-import React from "react";
 import { prisma } from "@/lib/db";
-import AdminCouponsClient from "@/components/AdminCouponsClient";
+import { PageHeader } from "@/components/admin/ui";
+import CouponManager from "@/components/admin/CouponManager";
 
-export const dynamic = "force-dynamic";
+export const metadata = { title: "Coupons" };
 
-export default async function AdminCouponsPage() {
-  let coupons: any[] = [];
-  try {
-    coupons = await prisma.coupon.findMany({
-      orderBy: { expiryDate: "asc" },
-    });
-  } catch (e) {
-    console.error("Coupons loader error", e);
-  }
-
-  return <AdminCouponsClient initialCoupons={coupons} />;
+export default async function AdminCoupons() {
+  const coupons = await prisma.coupon.findMany({ orderBy: { createdAt: "desc" } });
+  return (
+    <div>
+      <PageHeader title="Coupons" description="Discount codes customers can apply in their bag or at checkout." />
+      <CouponManager
+        initial={coupons.map((c) => ({
+          ...c,
+          startsAt: c.startsAt?.toISOString() ?? null,
+          expiresAt: c.expiresAt?.toISOString() ?? null,
+          createdAt: c.createdAt.toISOString(),
+          updatedAt: c.updatedAt.toISOString(),
+        }))}
+      />
+    </div>
+  );
 }

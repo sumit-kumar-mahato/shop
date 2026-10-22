@@ -1,0 +1,288 @@
+// Typed, validated website settings edited from the admin panel.
+// Pure module (no server imports) so the seed script and client forms can share it.
+import { z } from "zod";
+
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Use a 6-digit hex color like #c5a880");
+
+const safeLink = z
+  .string()
+  .trim()
+  .max(500)
+  .refine((v) => v === "" || (v.startsWith("/") && !v.startsWith("//")) || /^https?:\/\//i.test(v), {
+    message: "Must be a path starting with / or a full http(s) link",
+  });
+
+const imageUrl = z
+  .string()
+  .trim()
+  .max(1000)
+  .refine((v) => v === "" || v.startsWith("/api/images/") || v.startsWith("/") || /^https:\/\//i.test(v), {
+    message: "Image must be an uploaded image or an https:// link",
+  });
+
+const text = (max: number) => z.string().trim().max(max);
+const money = z.number().int().min(0).max(100_000_000); // paise
+
+// ─── Store settings ──────────────────────────────────────────
+
+export const storeSettingsSchema = z.object({
+  storeName: text(80).min(1),
+  logoText: text(40).min(1),
+  tagline: text(160),
+  primaryColor: hexColor,
+  contactEmail: z.string().trim().email().max(120),
+  contactPhone: text(30),
+  whatsappNumber: text(20),
+  address: text(300),
+  businessHours: text(120),
+  gstin: text(20),
+  social: z.object({
+    instagram: safeLink,
+    facebook: safeLink,
+    youtube: safeLink,
+  }),
+  seo: z.object({
+    title: text(120),
+    description: text(300),
+  }),
+  announcement: z.object({
+    enabled: z.boolean(),
+    text: text(160),
+    link: safeLink,
+  }),
+  shipping: z.object({
+    flatFee: money,
+    freeShippingThreshold: money, // 0 = shipping always charged unless flatFee is 0
+    estimatedDelivery: text(80),
+  }),
+  tax: z.object({
+    ratePercent: z.number().min(0).max(40),
+    pricesIncludeTax: z.boolean(),
+  }),
+  payments: z.object({
+    codEnabled: z.boolean(),
+    codMaxOrderValue: money, // 0 = no limit
+    onlineEnabled: z.boolean(),
+  }),
+  orders: z.object({
+    requireEmailVerification: z.boolean(),
+    returnWindowDays: z.number().int().min(0).max(60),
+    lowStockThreshold: z.number().int().min(0).max(1000),
+    notifyEmail: z.union([z.literal(""), z.string().trim().email()]),
+  }),
+});
+export type StoreSettings = z.infer<typeof storeSettingsSchema>;
+
+export const defaultStoreSettings: StoreSettings = {
+  storeName: "Prabodh Kumar Mahato Clothing",
+  logoText: "PRABODH KUMAR MAHATO",
+  tagline: "Premium clothing, heritage weaves and everyday essentials.",
+  primaryColor: "#c5a880",
+  contactEmail: "contact@example.com",
+  contactPhone: "+91 98765 43210",
+  whatsappNumber: "",
+  address: "Chowka, Jharkhand, Pincode 832404",
+  businessHours: "Mon – Sat, 10:00 AM – 8:00 PM",
+  gstin: "",
+  social: { instagram: "https://instagram.com", facebook: "https://facebook.com", youtube: "" },
+  seo: {
+    title: "Prabodh Kumar Mahato | Premium Clothing Store",
+    description: "Shop premium linens, Banarasi silk sarees, ethnic wear, denim and everyday essentials with fast delivery across India.",
+  },
+  announcement: { enabled: true, text: "Free shipping on orders above ₹1,999 · Easy 7-day returns", link: "/shop" },
+  shipping: { flatFee: 9900, freeShippingThreshold: 199900, estimatedDelivery: "3–7 business days" },
+  tax: { ratePercent: 5, pricesIncludeTax: true },
+  payments: { codEnabled: true, codMaxOrderValue: 2500000, onlineEnabled: true },
+  orders: { requireEmailVerification: false, returnWindowDays: 7, lowStockThreshold: 5, notifyEmail: "" },
+};
+
+// ─── Homepage ────────────────────────────────────────────────
+
+export const HOMEPAGE_SECTIONS = {
+  hero: "Hero banner carousel",
+  services: "Service highlights bar",
+  categories: "Shop by category",
+  "new-arrivals": "New arrivals",
+  promo: "Promotional banner",
+  "best-sellers": "Best sellers",
+  "flash-sale": "Flash sale with countdown",
+  featured: "Featured products",
+  trending: "Trending now",
+  "brand-story": "Brand story",
+  testimonials: "Customer reviews",
+  newsletter: "Newsletter sign-up",
+} as const;
+export type HomepageSectionId = keyof typeof HOMEPAGE_SECTIONS;
+
+const sectionIds = Object.keys(HOMEPAGE_SECTIONS) as [HomepageSectionId, ...HomepageSectionId[]];
+
+export const SERVICE_ICONS = ["truck", "refresh", "card", "shield", "gift", "star", "phone", "leaf"] as const;
+
+const bannerSchema = z.object({
+  id: z.string().min(1).max(40),
+  eyebrow: text(60),
+  title: text(80).min(1),
+  description: text(240),
+  buttonText: text(30),
+  link: safeLink,
+  image: imageUrl.refine((v) => v !== "", "Banner image is required"),
+  align: z.enum(["left", "center"]),
+});
+export type Banner = z.infer<typeof bannerSchema>;
+
+export const homepageSettingsSchema = z.object({
+  sections: z
+    .array(z.object({ id: z.enum(sectionIds), enabled: z.boolean() }))
+    .max(20),
+  banners: z.array(bannerSchema).max(8),
+  services: z
+    .array(z.object({ icon: z.enum(SERVICE_ICONS), title: text(40), description: text(80) }))
+    .max(4),
+  promo: z.object({
+    eyebrow: text(60),
+    title: text(100),
+    subtitle: text(240),
+    buttonText: text(30),
+    link: safeLink,
+    image: imageUrl,
+  }),
+  flashSale: z.object({
+    badge: text(40),
+    title: text(80),
+    subtitle: text(240),
+    endsAt: z.string().max(40), // ISO date-time; empty = no countdown
+  }),
+  brandStory: z.object({
+    eyebrow: text(40),
+    title: text(120),
+    body: text(2000),
+    image: imageUrl,
+  }),
+  newsletter: z.object({
+    title: text(80),
+    description: text(240),
+  }),
+});
+export type HomepageSettings = z.infer<typeof homepageSettingsSchema>;
+
+export const defaultHomepageSettings: HomepageSettings = {
+  sections: [
+    { id: "hero", enabled: true },
+    { id: "services", enabled: true },
+    { id: "categories", enabled: true },
+    { id: "new-arrivals", enabled: true },
+    { id: "promo", enabled: true },
+    { id: "best-sellers", enabled: true },
+    { id: "flash-sale", enabled: true },
+    { id: "featured", enabled: false },
+    { id: "trending", enabled: false },
+    { id: "brand-story", enabled: true },
+    { id: "testimonials", enabled: true },
+    { id: "newsletter", enabled: true },
+  ],
+  banners: [
+    {
+      id: "banner-1",
+      eyebrow: "New season",
+      title: "The Summer Couture",
+      description: "Linen, silk and breathable tailoring crafted for warm days and long evenings.",
+      buttonText: "Shop the collection",
+      link: "/shop",
+      image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1800&auto=format&fit=crop&q=80",
+      align: "left",
+    },
+    {
+      id: "banner-2",
+      eyebrow: "Heritage ethnic wear",
+      title: "Handwoven Silks & Embroidered Kurtas",
+      description: "Zardozi embroidery and authentic Banarasi silks designed for timeless celebrations.",
+      buttonText: "Shop ethnic",
+      link: "/shop?gender=women",
+      image: "https://images.unsplash.com/photo-1608748010899-18f300247112?w=1800&auto=format&fit=crop&q=80",
+      align: "left",
+    },
+  ],
+  services: [
+    { icon: "truck", title: "Free shipping", description: "On orders above ₹1,999" },
+    { icon: "refresh", title: "Easy returns", description: "7-day hassle-free returns" },
+    { icon: "card", title: "Secure payments", description: "UPI, cards & cash on delivery" },
+    { icon: "shield", title: "100% genuine", description: "Quality-checked fabrics" },
+  ],
+  promo: {
+    eyebrow: "Limited time",
+    title: "Festive Offers Are Here",
+    subtitle: "Up to 35% off handwoven Banarasi sarees and premium suits. Use code FESTIVE10 for an extra 10% off.",
+    buttonText: "View offers",
+    link: "/offers",
+    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1600&auto=format&fit=crop&q=80",
+  },
+  flashSale: {
+    badge: "Flash sale",
+    title: "Mid-Season Clearance",
+    subtitle: "Supima tees, raw denim and linen at limited-time prices.",
+    endsAt: "",
+  },
+  brandStory: {
+    eyebrow: "Our philosophy",
+    title: "Weaving Heritage with Modern Craft",
+    body:
+      "Founded with a dedication to premium materials and traditional textile crafts, our store focuses on longevity, comfort and timeless style. Every fabric is hand-selected from weavers and mills we trust.\n\nWe believe clothes should last for years, not a season — comfortable fits, honest prices, and respect for the artisans who make them.",
+    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&auto=format&fit=crop&q=80",
+  },
+  newsletter: {
+    title: "Get early access to new arrivals",
+    description: "Subscribe for new collection launches, private offers and styling notes. No spam — unsubscribe any time.",
+  },
+};
+
+// ─── Pages (about + policies) ────────────────────────────────
+
+export const POLICY_PAGES = {
+  shipping: "Shipping Policy",
+  returns: "Returns & Refunds",
+  privacy: "Privacy Policy",
+  terms: "Terms of Service",
+} as const;
+export type PolicySlug = keyof typeof POLICY_PAGES;
+
+export const pagesSettingsSchema = z.object({
+  about: z.object({ title: text(120), body: text(10000), image: imageUrl }),
+  policies: z.object({
+    shipping: text(20000),
+    returns: text(20000),
+    privacy: text(20000),
+    terms: text(20000),
+  }),
+});
+export type PagesSettings = z.infer<typeof pagesSettingsSchema>;
+
+export const defaultPagesSettings: PagesSettings = {
+  about: {
+    title: "Our Story",
+    body:
+      "We started as a small family clothing shop with a simple promise: honest quality at fair prices.\n\nToday we bring the same care online — from handwoven sarees and festive ethnic wear to everyday cottons and denim. Every piece is checked by hand before it is packed for you.\n\n## Visit us\nYou are always welcome at our store. Find our address and hours on the Contact page.",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&auto=format&fit=crop&q=80",
+  },
+  policies: {
+    shipping:
+      "## Delivery times\nOrders are packed within 1–2 business days and delivered within 3–7 business days across India.\n\n## Shipping charges\nShipping is free on orders above the free-shipping threshold shown at checkout. A flat fee applies to smaller orders.\n\n## Tracking\nOnce your order ships you will receive the courier name and tracking number by email and in My Account → Orders.",
+    returns:
+      "## Return window\nYou can request a return within 7 days of delivery from My Account → Orders. Items must be unused, unwashed and have original tags.\n\n## Refunds\nOnline payments are refunded to the original payment method within 5–7 business days after we receive the item. Cash on Delivery orders are refunded by bank transfer/UPI.\n\n## Non-returnable items\nUndergarments, customised and altered items cannot be returned for hygiene reasons.",
+    privacy:
+      "## What we collect\nWe collect your name, contact details and delivery address to process orders. Payments are processed securely by our payment partner — we never see or store your card details.\n\n## How we use it\nOnly to fulfil your orders, provide support and — if you subscribe — send our newsletter.\n\n## Your rights\nYou can update your details from My Account, or contact us to delete your account.",
+    terms:
+      "## Orders\nAll orders are subject to availability and confirmation. Prices are listed in Indian Rupees.\n\n## Accounts\nYou are responsible for keeping your password confidential.\n\n## Contact\nFor any questions about these terms, please contact us using the details on our Contact page.",
+  },
+};
+
+export const SETTINGS = {
+  store: { schema: storeSettingsSchema, defaults: defaultStoreSettings },
+  homepage: { schema: homepageSettingsSchema, defaults: defaultHomepageSettings },
+  pages: { schema: pagesSettingsSchema, defaults: defaultPagesSettings },
+} as const;
+export type SettingKey = keyof typeof SETTINGS;
+export type SettingValue<K extends SettingKey> = K extends "store"
+  ? StoreSettings
+  : K extends "homepage"
+    ? HomepageSettings
+    : PagesSettings;

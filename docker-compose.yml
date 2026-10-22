@@ -1,35 +1,43 @@
-version: '3.8'
-
+# Runs the database and the production build of the store.
+#   docker compose up -d --build        → http://localhost:3000
+# For development with hot reload, run only the database:
+#   docker compose up -d db   and then   npm run dev
 services:
   db:
-    image: postgres:15-alpine
-    container_name: luxury_fashion_db
-    restart: always
+    image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: local_password
-      POSTGRES_DB: luxury_shop
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_password}
+      POSTGRES_DB: pkm_shop
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pkm_shop"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   shop:
     build: .
-    container_name: luxury_fashion_store
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "3000:3000"
+    env_file:
+      - path: .env
+        required: false
     environment:
-      - DATABASE_URL=postgresql://postgres:local_password@db:5432/luxury_shop?sslmode=disable
-      - PORT=3000
-      - NODE_ENV=development
-    volumes:
-      - ./prisma:/app/prisma
-      - ./src:/app/src
-      - ./public:/app/public
-    depends_on:
-      - db
-    restart: always
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-local_password}@db:5432/pkm_shop?schema=public
+      DIRECT_URL: postgresql://postgres:${POSTGRES_PASSWORD:-local_password}@db:5432/pkm_shop?schema=public
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in your .env file}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
 
 volumes:
   pgdata:

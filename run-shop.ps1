@@ -1,74 +1,55 @@
-# PowerShell Runner Script for Prabodh Kumar Mahato Luxury Storefront & CMS
-# Double-click or run this script to launch the application using Docker
+# Starts the Prabodh Kumar Mahato clothing store with Docker Desktop.
+# Right-click → "Run with PowerShell".
 
 Clear-Host
-
+Set-Location -Path $PSScriptRoot
 Write-Output "========================================================"
-Write-Output "   PRABODH KUMAR MAHATO LUXURY CLOTHING RETAIL SYSTEM   "
-Write-Output "        No-Code visual Storefront & Admin CMS           "
-Write-Output "========================================================"
-Write-Output ""
-
-# 1. Check if Docker is installed
-$dockerInstalled = Get-Command docker -ErrorAction SilentlyContinue
-if (-not $dockerInstalled) {
-    Write-Warning "Docker is not detected on your system."
-    Write-Output "Please download and install Docker Desktop first: https://www.docker.com/products/docker-desktop/"
-    Write-Output "After installation, restart your computer and run this script again."
-    Read-Host "Press ENTER to exit..."
-    exit
-}
-
-# 2. Check if Docker Daemon is running
-Write-Output "[*] Verifying Docker environment status..."
-& docker ps > $null 2>&1
-if ($LastExitCode -ne 0) {
-    Write-Warning "Docker is installed, but the daemon is not running."
-    Write-Output "Please open 'Docker Desktop' from your Start Menu and wait for it to start (green indicator)."
-    Write-Output "Once Docker is running, press any key to continue..."
-    Read-Host
-}
-
-# 3. Build container
-Write-Output "[*] Building your eCommerce storefront container image (Next.js & SQLite)..."
-Write-Output "    (This might take a few minutes on first run to download dependencies)"
-& docker compose build
-if ($LastExitCode -ne 0) {
-    Write-Error "Failed to build the container. Check above logs for compilation details."
-    Read-Host "Press ENTER to exit..."
-    exit
-}
-
-# 4. Spin up container
-Write-Output ""
-Write-Output "[*] Launching storefront server..."
-& docker compose up -d
-if ($LastExitCode -ne 0) {
-    Write-Error "Failed to launch the container service."
-    Read-Host "Press ENTER to exit..."
-    exit
-}
-
-# 5. Success summary
-Write-Output ""
-Write-Output "========================================================"
-Write-Output "  SUCCESS! Your luxury clothing storefront is running.  "
-Write-Output "  Database (SQLite) has been seeded with fashion items. "
+Write-Output "   PRABODH KUMAR MAHATO CLOTHING STORE"
 Write-Output "========================================================"
 Write-Output ""
-Write-Output "  [+] Customer Website: http://localhost:3000"
-Write-Output "  [+] Visual Admin CMS: http://localhost:3000/admin"
-Write-Output ""
-Write-Output "[*] Automatically opening your browser to storefront..."
-Start-Sleep -Seconds 2
 
-# Open default browser
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Warning "Docker is not installed. Download Docker Desktop: https://www.docker.com/products/docker-desktop/"
+    Read-Host "Press ENTER to exit"
+    exit 1
+}
+
+& docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Docker Desktop is not running. Start it from the Start menu, wait for the green status, then run this script again."
+    Read-Host "Press ENTER to exit"
+    exit 1
+}
+
+# First run: create .env with a random session secret and ask for the admin login.
+if (-not (Test-Path ".env")) {
+    Write-Output "First-time setup — let's create your administrator account."
+    $adminEmail = Read-Host "Admin email"
+    $adminPassword = Read-Host "Admin password (at least 10 characters)"
+    $bytes = New-Object byte[] 48
+    [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+    $secret = [Convert]::ToBase64String($bytes)
+    $lines = (Get-Content ".env.example") `
+        -replace '^AUTH_SECRET=.*', "AUTH_SECRET=`"$secret`"" `
+        -replace '^ADMIN_EMAIL=.*', "ADMIN_EMAIL=`"$adminEmail`"" `
+        -replace '^ADMIN_PASSWORD=.*', "ADMIN_PASSWORD=`"$adminPassword`""
+    Set-Content -Path ".env" -Value $lines -Encoding utf8
+    Write-Output "Saved settings to .env"
+}
+
+Write-Output "[*] Building and starting the store (first run can take several minutes)..."
+& docker compose up -d --build
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Could not start the store. See the messages above."
+    Read-Host "Press ENTER to exit"
+    exit 1
+}
+
+Write-Output ""
+Write-Output "  Store:        http://localhost:3000"
+Write-Output "  Admin panel:  http://localhost:3000/admin   (sign in with your admin email)"
+Write-Output ""
+Write-Output "  To stop:      docker compose down"
+Start-Sleep -Seconds 5
 Start-Process "http://localhost:3000"
-Start-Process "http://localhost:3000/admin"
-
-Write-Output ""
-Write-Output "========================================================"
-Write-Output "  To stop the server, run: docker compose down          "
-Write-Output "========================================================"
-Write-Output ""
-Read-Host "Press ENTER to close this window..."
+Read-Host "Press ENTER to close this window"
