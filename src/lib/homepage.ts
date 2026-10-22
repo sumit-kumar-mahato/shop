@@ -14,3 +14,6 @@ export function youtubeId(url: string): string | null {
   const m = url.match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/);
   return m ? m[1] : null;
 }
+
+// Deliberate type error to test the release pipeline alert (reverted in the next commit).
+export const pipelineDrill: number = "not a number";
