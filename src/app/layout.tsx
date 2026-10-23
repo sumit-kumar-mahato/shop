@@ -4,6 +4,7 @@ import "./globals.css";
 import { getSettings } from "@/lib/settings";
 import { getCurrentUser } from "@/lib/auth/session";
 import type { ThemeSettings } from "@/lib/settings-schema";
+import { localKeywords } from "@/lib/local-seo";
 import { contrastTextTriplet, hexToRgbTriplet } from "@/lib/utils";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -32,6 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(appUrl),
     title: { default: store.seo.title, template: `%s | ${store.storeName}` },
     description: store.seo.description,
+    keywords: localKeywords(store),
     applicationName: store.storeName,
     openGraph: { type: "website", siteName: store.storeName, title: store.seo.title, description: store.seo.description, locale: "en_IN" },
     twitter: { card: "summary_large_image" },

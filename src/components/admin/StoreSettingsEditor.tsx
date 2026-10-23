@@ -6,6 +6,8 @@ import { Checkbox, Field, FormError, Input, Textarea } from "@/components/ui/For
 import { Panel } from "@/components/admin/ui";
 import SettingsSaveBar from "@/components/admin/SettingsSaveBar";
 import { useSettingsForm } from "@/components/admin/useSettingsForm";
+import { TagInput } from "@/components/admin/fields";
+import { localTagline } from "@/lib/local-seo";
 import type { StoreSettings } from "@/lib/settings-schema";
 
 const rupees = (paise: number) => String(paise / 100);
@@ -111,9 +113,38 @@ export default function StoreSettingsEditor({ initial, integrations }: { initial
           </div>
         </Panel>
 
+        <Panel title="Local search (Google)" description="Help people find you by your shop's other names and by place — e.g. “Prabodh Mahato shop” or “clothes shop Chowka”." className="lg:col-span-2">
+          <div className="space-y-4">
+            <Field label="Other names people use for your shop" hint="Type a name and press Enter. Shown on the site and given to Google as your shop's other names.">
+              <TagInput value={v.local.alsoKnownAs} onChange={(alsoKnownAs) => set("local", { ...v.local, alsoKnownAs })} placeholder="e.g. Prabodh Mahato Shop" max={10} />
+            </Field>
+            <div className="grid gap-4 sm:grid-cols-4">
+              <Field label="Town / village"><Input value={v.local.locality} onChange={(e) => set("local", { ...v.local, locality: e.target.value })} placeholder="Chowka" /></Field>
+              <Field label="District" hint="Optional"><Input value={v.local.district} onChange={(e) => set("local", { ...v.local, district: e.target.value })} /></Field>
+              <Field label="State"><Input value={v.local.region} onChange={(e) => set("local", { ...v.local, region: e.target.value })} /></Field>
+              <Field label="PIN code"><Input value={v.local.postalCode} onChange={(e) => set("local", { ...v.local, postalCode: e.target.value.replace(/\D/g, "").slice(0, 6) })} inputMode="numeric" /></Field>
+            </div>
+            <Field label="Nearby towns and villages you serve" hint="Where your customers come from. Type a place and press Enter.">
+              <TagInput value={v.local.areasServed} onChange={(areasServed) => set("local", { ...v.local, areasServed })} placeholder="e.g. Kurli" />
+            </Field>
+            <Field label="Google Maps link to your shop" hint="Open your shop in Google Maps → Share → Copy link. Adds “Get directions” to the site.">
+              <Input value={v.local.mapUrl} onChange={(e) => set("local", { ...v.local, mapUrl: e.target.value })} placeholder="https://maps.app.goo.gl/…" />
+            </Field>
+            <Checkbox label="Show an “About our store” section at the bottom of the homepage (recommended — Google ranks what visitors can read)" checked={v.local.showOnHomepage} onChange={(e) => set("local", { ...v.local, showOnHomepage: e.target.checked })} />
+            {v.local.showOnHomepage && (
+              <Field label="Your own text for that section (optional)" hint="Leave empty and it's written for you from the details above. Blank line between paragraphs.">
+                <Textarea rows={3} value={v.local.intro} onChange={(e) => set("local", { ...v.local, intro: e.target.value })} />
+              </Field>
+            )}
+            <p className="rounded-md bg-zinc-50 p-3 text-xs text-zinc-600 dark:bg-zinc-950 dark:text-zinc-400">
+              Every page footer will say: <strong className="text-zinc-900 dark:text-white">{localTagline(v) || "—"}</strong>
+            </p>
+          </div>
+        </Panel>
+
         <Panel title="Search engines (SEO)" className="lg:col-span-2">
           <div className="space-y-4">
-            <Field label="Homepage title"><Input value={v.seo.title} onChange={(e) => set("seo", { ...v.seo, title: e.target.value })} maxLength={120} /></Field>
+            <Field label="Homepage title" hint="What Google shows as the blue link. Include your shop name, “shop” or “store”, and your town — under 60 characters."><Input value={v.seo.title} onChange={(e) => set("seo", { ...v.seo, title: e.target.value })} maxLength={120} /></Field>
             <Field label="Homepage description"><Textarea rows={2} value={v.seo.description} onChange={(e) => set("seo", { ...v.seo, description: e.target.value })} maxLength={300} /></Field>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Google Search Console code" hint="From Search Console → Add property → HTML tag. Paste the code or the whole tag.">

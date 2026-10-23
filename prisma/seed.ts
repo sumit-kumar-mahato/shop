@@ -7,7 +7,7 @@
  */
 import { PrismaClient, type Gender, type Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { defaultHomepageSettings, defaultPagesSettings, defaultStoreSettings, defaultThemeSettings } from "../src/lib/settings-schema";
+import { LEGACY_SEO_DEFAULTS, defaultHomepageSettings, defaultPagesSettings, defaultStoreSettings, defaultThemeSettings } from "../src/lib/settings-schema";
 
 // Load .env for local runs; hosted platforms provide real environment variables instead.
 try {
@@ -65,6 +65,21 @@ async function seedSettings() {
       const value = { ...defaultThemeSettings, primaryColor: legacy };
       await prisma.setting.create({ data: { key: "theme", value: value as unknown as Prisma.InputJsonValue } });
       console.log(`✓ Brand colour ${legacy} moved to Appearance settings.`);
+    }
+  }
+
+  // Upgrade the search-result title/description to the local-search wording, but only where the owner
+  // never changed the original defaults.
+  const storeRow = await prisma.setting.findUnique({ where: { key: "store" } });
+  const stored = storeRow?.value as { seo?: { title?: string; description?: string } } | null;
+  if (storeRow && stored?.seo) {
+    const seo = { ...stored.seo };
+    if (seo.title === LEGACY_SEO_DEFAULTS.title) seo.title = defaultStoreSettings.seo.title;
+    if (seo.description === LEGACY_SEO_DEFAULTS.description) seo.description = defaultStoreSettings.seo.description;
+    if (seo.title !== stored.seo.title || seo.description !== stored.seo.description) {
+      const value = { ...stored, seo } as unknown as Prisma.InputJsonValue;
+      await prisma.setting.update({ where: { key: "store" }, data: { value } });
+      console.log("✓ Search-result title and description updated for local search.");
     }
   }
 }

@@ -3,6 +3,7 @@ import { Facebook, Instagram, Mail, MapPin, Phone, Youtube, Clock } from "lucide
 import type { NavigationSettings, StoreSettings } from "@/lib/settings-schema";
 import NewsletterForm from "./NewsletterForm";
 import Logo, { type LogoConfig } from "./Logo";
+import { localTagline } from "@/lib/local-seo";
 
 const PAYMENT_BADGES = ["UPI", "VISA", "Mastercard", "RuPay", "COD"];
 
@@ -29,10 +30,16 @@ export default function Footer({
             <Logo logo={{ ...logo, text: store.logoText }} />
           </Link>
           <p className="max-w-sm text-sm leading-relaxed text-luxury-600 dark:text-zinc-400">{footer.about || store.tagline}</p>
+          {localTagline(store) && <p className="max-w-sm text-xs text-luxury-500">{localTagline(store)}</p>}
           <ul className="space-y-2 text-sm text-luxury-700 dark:text-zinc-300">
             {store.address && (
               <li className="flex gap-2">
-                <MapPin size={16} className="mt-0.5 flex-shrink-0 text-brand" /> {store.address}
+                <MapPin size={16} className="mt-0.5 flex-shrink-0 text-brand" />
+                {store.local.mapUrl ? (
+                  <a href={store.local.mapUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{store.address}</a>
+                ) : (
+                  store.address
+                )}
               </li>
             )}
             {store.contactPhone && (

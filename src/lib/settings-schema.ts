@@ -66,6 +66,18 @@ export const storeSettingsSchema = z.object({
     text: text(160),
     link: safeLink,
   }),
+  // Local search: helps people find the shop by its other names and by place ("prabodh mahato shop", "clothes shop chowka").
+  local: z.object({
+    alsoKnownAs: z.array(text(60).min(1)).max(10), // other names customers use for the shop
+    locality: text(60), // town / village
+    district: text(60),
+    region: text(60), // state
+    postalCode: z.string().trim().regex(/^(\d{6})?$/, "Use a 6-digit PIN code"),
+    areasServed: z.array(text(60).min(1)).max(20), // nearby towns and villages customers come from
+    mapUrl: safeLink, // Google Maps link to the shop
+    showOnHomepage: z.boolean(), // short "about our store" section at the bottom of the homepage
+    intro: text(1500), // custom text for that section; empty = written automatically
+  }),
   shipping: z.object({
     flatFee: money,
     freeShippingThreshold: money, // 0 = shipping always charged unless flatFee is 0
@@ -89,6 +101,12 @@ export const storeSettingsSchema = z.object({
 });
 export type StoreSettings = z.infer<typeof storeSettingsSchema>;
 
+/** Earlier default search texts; the seed upgrades stores that never changed them (see prisma/seed.ts). */
+export const LEGACY_SEO_DEFAULTS = {
+  title: "Prabodh Kumar Mahato | Premium Clothing Store",
+  description: "Shop premium linens, Banarasi silk sarees, ethnic wear, denim and everyday essentials with fast delivery across India.",
+};
+
 export const defaultStoreSettings: StoreSettings = {
   storeName: "Prabodh Kumar Mahato Clothing",
   logoText: "PRABODH KUMAR MAHATO",
@@ -101,12 +119,24 @@ export const defaultStoreSettings: StoreSettings = {
   gstin: "",
   social: { instagram: "https://instagram.com", facebook: "https://facebook.com", youtube: "" },
   seo: {
-    title: "Prabodh Kumar Mahato | Premium Clothing Store",
-    description: "Shop premium linens, Banarasi silk sarees, ethnic wear, denim and everyday essentials with fast delivery across India.",
+    title: "Prabodh Kumar Mahato Clothing Shop in Chowka, Jharkhand",
+    description:
+      "Prabodh Kumar Mahato (Prabodh Mahato Shop) is a clothing store in Chowka, Jharkhand. Sarees, ethnic wear, shirts, jeans and kids' clothing — shop online with delivery across India.",
     googleVerification: "",
     bingVerification: "",
   },
   announcement: { enabled: true, text: "Free shipping on orders above ₹1,999 · Easy 7-day returns", link: "/shop" },
+  local: {
+    alsoKnownAs: ["Prabodh Mahato Shop", "Prabodh Shop", "Mahato Shop", "Mahato Cloth Store", "PKM Clothing"],
+    locality: "Chowka",
+    district: "",
+    region: "Jharkhand",
+    postalCode: "832404",
+    areasServed: ["Chowka", "Kurli"],
+    mapUrl: "",
+    showOnHomepage: true,
+    intro: "",
+  },
   shipping: { flatFee: 9900, freeShippingThreshold: 199900, estimatedDelivery: "3–7 business days" },
   tax: { ratePercent: 5, pricesIncludeTax: true },
   payments: { codEnabled: true, codMaxOrderValue: 2500000, onlineEnabled: true },

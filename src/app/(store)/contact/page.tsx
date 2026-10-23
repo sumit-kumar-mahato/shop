@@ -22,7 +22,16 @@ export default async function ContactPage() {
           <ContactForm defaultName={user?.name ?? ""} defaultEmail={user?.email ?? ""} />
         </Card>
         <div className="space-y-4 text-sm">
-          {store.address && <Info icon={<MapPin size={18} />} title="Visit our store">{store.address}</Info>}
+          {store.address && (
+            <Info icon={<MapPin size={18} />} title="Visit our store">
+              {store.address}
+              {store.local.mapUrl && (
+                <a href={store.local.mapUrl} target="_blank" rel="noopener noreferrer" className="mt-1 block font-semibold hover:underline">
+                  Get directions →
+                </a>
+              )}
+            </Info>
+          )}
           {store.contactPhone && (
             <Info icon={<Phone size={18} />} title="Call us">
               <a href={`tel:${store.contactPhone.replace(/\s/g, "")}`} className="hover:underline">{store.contactPhone}</a>

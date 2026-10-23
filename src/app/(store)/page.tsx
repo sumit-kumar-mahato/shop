@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
-import { ArrowRight, ArrowUpRight, Quote } from "lucide-react";
+import { ArrowRight, ArrowUpRight, MapPin, Quote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { getProductCards } from "@/lib/catalog";
 import { env } from "@/lib/env";
+import { localBusinessFields, localIntro } from "@/lib/local-seo";
 import { activeBanners } from "@/lib/homepage";
 import { GENDER_LABELS } from "@/lib/constants";
 import { formatINR } from "@/lib/money";
@@ -47,6 +48,7 @@ async function storeJsonLd() {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: store.storeName,
+      ...(store.local.alsoKnownAs.length ? { alternateName: store.local.alsoKnownAs } : {}),
       url,
       potentialAction: { "@type": "SearchAction", target: `${url}/shop?q={search_term_string}`, "query-input": "required name=search_term_string" },
     },
@@ -59,7 +61,7 @@ async function storeJsonLd() {
       description: store.seo.description || store.tagline,
       email: store.contactEmail,
       ...(store.contactPhone ? { telephone: store.contactPhone } : {}),
-      ...(store.address ? { address: { "@type": "PostalAddress", streetAddress: store.address, addressCountry: "IN" } } : {}),
+      ...localBusinessFields(store),
       // Only real profile links (not a bare https://instagram.com placeholder).
       sameAs: Object.values(store.social).filter((s) => /^https:\/\/[^/]+\/[^/]+/.test(s)),
     },
@@ -114,7 +116,12 @@ export default async function HomePage() {
     Promise.all(productBlocks.map(async (b) => [b.id, await loadBlockProducts(b)] as const)).then((e) => new Map(e)),
   ]);
   const text = home.sectionText;
-  const jsonLd = await storeJsonLd();
+  const [jsonLd, store, categoryNames] = await Promise.all([
+    storeJsonLd(),
+    getSettings("store"),
+    prisma.category.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }], select: { name: true } }),
+  ]);
+  const about = store.local.showOnHomepage ? localIntro(store, categoryNames.map((c) => c.name)) : null;
 
   const renderBlock = (block: HomepageBlock) => {
     switch (block.type) {
@@ -369,6 +376,24 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className={cn("space-y-24 pb-8 sm:space-y-32", !heroFirst && "pt-10")}>
         {enabled.map((s, i) => render(s.id, i))}
+        {about && (
+          <section className="container-page" aria-labelledby="about-store">
+            <Reveal className="mx-auto max-w-3xl border-t border-luxury-200 pt-16 text-center dark:border-zinc-800">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand">About our store</p>
+              <h2 id="about-store" className="mt-3 font-serif text-3xl sm:text-4xl">{about.heading}</h2>
+              <div className="mt-6 space-y-4 leading-relaxed text-luxury-600 dark:text-zinc-400">
+                {about.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+              {store.local.mapUrl && (
+                <a href={store.local.mapUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold underline-offset-4 hover:underline">
+                  <MapPin size={15} className="text-brand" /> Get directions to the shop
+                </a>
+              )}
+            </Reveal>
+          </section>
+        )}
       </div>
     </>
   );

@@ -2,7 +2,7 @@
 
 // Form building blocks shared by the website editors in the admin panel.
 import React, { useId, useState } from "react";
-import { ArrowDown, ArrowUp, ChevronDown, Copy, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Copy, Plus, Trash2, X } from "lucide-react";
 import { ICONS, type IconName } from "@/lib/settings-schema";
 import Icon from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
@@ -259,5 +259,44 @@ export function IconBtn({ label, onClick, disabled, danger, children }: { label:
     >
       {children}
     </button>
+  );
+}
+
+/** List of short phrases edited as removable chips: type and press Enter (or comma) to add. */
+export function TagInput({ value, onChange, placeholder, max = 20 }: { value: string[]; onChange: (v: string[]) => void; placeholder?: string; max?: number }) {
+  const [draft, setDraft] = useState("");
+  const add = (raw: string) => {
+    const items = raw.split(",").map((s) => s.trim()).filter(Boolean);
+    const next = [...value];
+    for (const item of items) if (!next.some((x) => x.toLowerCase() === item.toLowerCase()) && next.length < max) next.push(item);
+    onChange(next);
+    setDraft("");
+  };
+  return (
+    <div className="flex min-h-11 flex-wrap items-center gap-1.5 rounded-md border border-zinc-200 bg-white p-1.5 focus-within:border-zinc-900 focus-within:ring-1 focus-within:ring-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:focus-within:border-white dark:focus-within:ring-white">
+      {value.map((tag) => (
+        <span key={tag} className="flex items-center gap-1 rounded-md bg-zinc-100 py-1 pl-2.5 pr-1 text-sm dark:bg-zinc-800">
+          {tag}
+          <button type="button" onClick={() => onChange(value.filter((t) => t !== tag))} className="rounded p-0.5 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 dark:hover:bg-zinc-700 dark:hover:text-white" aria-label={`Remove ${tag}`}>
+            <X size={13} />
+          </button>
+        </span>
+      ))}
+      {value.length < max && (
+        <input
+          value={draft}
+          onChange={(e) => (e.target.value.includes(",") ? add(e.target.value) : setDraft(e.target.value))}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (draft.trim()) add(draft);
+            } else if (e.key === "Backspace" && !draft && value.length) onChange(value.slice(0, -1));
+          }}
+          onBlur={() => draft.trim() && add(draft)}
+          placeholder={value.length ? "Add more…" : placeholder}
+          className="h-8 min-w-[140px] flex-1 bg-transparent px-1.5 text-sm outline-none"
+        />
+      )}
+    </div>
   );
 }
